@@ -38,7 +38,7 @@ CREATE TABLE Categoria(
 );
 
 INSERT INTO Categoria VALUES(1, 10, 'si gioca 5 Vs 5 regole del Basket FIBA', false);
-INSERT INTO Categoria VALUES(2, 4, 'si gioca 2 Vs 2 regole del Tennis doppio', false);
+INSERT INTO Categoria VALUES(2, 12, 'si gioca 6 Vs 6 regole della pallavolo classica', false);
 INSERT INTO Categoria VALUES(3, 2, 'si gioca 1 Vs 1 regole del Tennis singolo', false);
 INSERT INTO Categoria VALUES(4, 14, 'si gioca 7 Vs 7 regole del Calcio a 7', false);
 
@@ -140,8 +140,8 @@ CREATE TABLE Impianto(
 	via varchar(20) not null,
 	telefono decimal (9,0) not null,
 	email varchar (30) not null,
-	latitudine float (),
-	longitudine float (),
+	latitudine float (10),
+	longitudine float (10),
 	UNIQUE(telefono),
 	UNIQUE(email)
 );
@@ -158,33 +158,37 @@ CREATE TABLE Evento(
 	ID decimal (5,0) PRIMARY KEY,
 	data date not null,
 	data_disiscrizione date not null check(data_disiscrizione < data),
-	foto boolean not null,
+	foto boolean not null DEFAULT false,
 	Categoria decimal(5,0) not null REFERENCES Categoria (ID),
 	Torneo varchar(20) REFERENCES Torneo (NomeT),
 	Impianto varchar(20) not null REFERENCES Impianto(NomeI),
-	Organizzatore varchar(25) not null REFERENCES Utente(Username),
+	Organizzatore varchar(25) not null REFERENCES Utente(Username) CHECK (is_organizzatore_premium(Organizzatore)),
 	stato varchar(6) not null default 'aperto' check (stato in ('aperto','chiuso'))
 );
-	
+
+INSERT INTO Evento VALUES (1, current_date, '20/06/2024', 'false' , 1, 'NBA', 'calcio Gambaro', 'user123');
+INSERT INTO Evento VALUES (2, current_date, '21/06/2024', 'TRUE' , 3, 'Roland garros', 'tennis Puggia', 'user123');
+INSERT INTO Evento VALUES (3, current_date, '22/06/2024', 'false' , 2, 'FIVB', 'pallavolo Puggia', 'user789');
+
+
 ---------------------------------------------------------------------------------------------------
-CREATE OR REPLACE FUNCTION not_in_this_event(Sostituto varchar, ID decimal)
+CREATE OR REPLACE FUNCTION not_in_this_event(Sostituto varchar, Evento decimal)
 RETURNS boolean
 AS $$
-DECLARE
-  in_this_event boolean;
 BEGIN
 
-
-  IF Sostituto NOT IN(  SELECT Username 
+  IF Sostituto IN(  SELECT Username
   						FROM Utente natural join Iscrive
-  						WHERE ID = Iscrive.ID) 
+  						WHERE Evento = Iscrive.ID)
   THEN
-    RETURN TRUE;
-  ELSE
     RETURN FALSE;
+  ELSE
+    RETURN TRUE;
   END IF;
 END $$
 LANGUAGE plpgsql;
+
+--DROP FUNCTION not_in_this_event(varchar, decimal);
 
 
 
@@ -198,8 +202,12 @@ CREATE TABLE Iscrive(
 	ritardo boolean,
 	no_show boolean,
 	PRIMARY KEY (Username, ID),
-	UNIQUE(ID,Sostituto)
+	UNIQUE(Username,ID,Sostituto)
 );
 
+INSERT INTO Iscrive VALUES ('user123',1,null,null,current_date,'giocatore',null,null);
+INSERT INTO Iscrive VALUES ('user123',2,null,null,current_date,'giocatore',null,null);
+INSERT INTO Iscrive VALUES ('user456',3,null,null,current_date,'giocatore',null,null);
+INSERT INTO Iscrive VALUES ('user456',2,null,null,current_date,'giocatore',null,null);
 
-
+-----------------------------------------------------------------
