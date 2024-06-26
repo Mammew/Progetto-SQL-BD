@@ -69,20 +69,27 @@ INSERT INTO Liv_Utente VALUES(3, 'user789', 70);
 INSERT INTO Liv_Utente VALUES(4, 'user789', 40);
 
 -------------------------------------------------------------------------
+
 CREATE TABLE Squadra(
 	ID decimal (5,0) PRIMARY KEY,
 	NomeS varchar(25) not null,
+	Torneo varchar(20) not null REFERENCES Torneo (NomeT), -- forse serve il not null
 	num_giocatori_max decimal (2,0) not null,
 	num_giocatori_min decimal (2,0) not null,
 	colore_maglia varchar (15),
 	stato varchar(6) not null default 'aperto' check (stato in ('aperto','chiuso')),
-	descrizione varchar (100)
+	descrizione varchar (100),
+	UNIQUE(NomeS,Torneo)
 );
 
-INSERT INTO Squadra VALUES(1, 'Boston', 16, 5, 'verde','aperto');
-INSERT INTO Squadra VALUES(2, 'NonTroppoAtletici', 14, 6, 'bianco','aperto');
-INSERT INTO Squadra VALUES(3, 'Cardedu', 2, 2, 'blu','aperto');
-INSERT INTO Squadra VALUES(4, 'SanfruBeach', 26, 11, 'rosso','aperto');
+INSERT INTO Squadra VALUES(1, 'Boston', 'NBA', 16, 5, 'verde','aperto');
+INSERT INTO Squadra VALUES(2, 'NonTroppoAtletici', 'FIVB', 14, 6, 'bianco','aperto');
+INSERT INTO Squadra VALUES(3, 'Cardedu', 'Roland garros', 2, 2, 'blu','aperto');
+INSERT INTO Squadra VALUES(4, 'SanfruBeach', 'Europeo', 26, 11, 'rosso','aperto');
+INSERT INTO Squadra VALUES(5, 'Boston', 'FIBA', 26, 11, 'rosso','aperto');
+INSERT INTO Squadra VALUES(6, 'SanfruBeach', 'Mondiale', 26, 11, 'rosso','aperto');
+
+------------------------------------------------------------------------------------------
 
 CREATE TABLE Candidatura(
 	Username varchar (25) references Utente (Username),
@@ -133,7 +140,79 @@ INSERT INTO Torneo VALUES ('Roland garros', '25/08/2024','user123' ,'Torneo Tenn
 INSERT INTO Torneo VALUES ('FIVB',' 25/08/2024', 'user789', 'Torneo Pallavolo');
 INSERT INTO Torneo VALUES ('Europeo', '1/08/2024', 'user789', 'Torneo Calcio a 7');
 INSERT INTO Torneo VALUES ('NBA', '10/07/2024', 'user123', 'Torneo Basket indor');
+INSERT INTO Torneo VALUES ('Mondiale', '1/08/2025', 'user123', 'Torneo Calcio a 7');
+INSERT INTO Torneo VALUES ('FIBA', '1/08/2025', 'user123', 'Torneo Basket indor');
 
+---------------------------------------------------------------------------------
+
+CREATE TABLE Restrizioni(
+	ID decimal (2,0) PRIMARY KEY,
+	descrizione varchar(100) not null
+);
+
+INSERT INTO Restrizioni VALUES (1, 'Torneo solamente per altleti non tesserati');
+INSERT INTO Restrizioni VALUES (2, 'Torneo solamente per femmine ');
+INSERT INTO Restrizioni VALUES (3, 'Torneo solamente per maschi ');
+INSERT INTO Restrizioni VALUES (4, 'Torneo solamente per atleti over 25');
+
+CREATE TABLE RestrizioniTorneo(
+	ID decimal(2,0) REFERENCES Restrizioni (ID),
+	NomeT varchar (25) REFERENCES Torneo(NomeT),
+	PRIMARY KEY (ID,NomeT)
+);
+
+INSERT INTO RestrizioniTorneo VALUES(1, 'NBA');
+
+INSERT INTO RestrizioniTorneo VALUES(1,'Europeo');
+
+---------------------------------------------------------------------
+
+CREATE TABLE Premio (
+	ID decimal(2,0) PRIMARY KEY,
+	premio varchar(100) not null
+);
+
+INSERT INTO Premio VALUES (1, 'Trofeo al vincitore del Torneo');
+INSERT INTO Premio VALUES (2, 'Trofeo al secondo classificato del Torneo');
+INSERT INTO Premio VALUES (3, 'Trofeo al terzo classificato del Torneo');
+INSERT INTO Premio VALUES (4, 'Medaglia ai partecipanti delle fasi finali del Torneo');
+
+CREATE TABLE PremioTorneo(
+	ID decimal(2,0) REFERENCES Premio (ID),
+	NomeT varchar (25) REFERENCES Torneo(NomeT),
+	PRIMARY KEY (ID,NomeT)
+);
+
+INSERT INTO PremioTorneo VALUES(1,'NBA');
+INSERT INTO PremioTorneo VALUES(2,'NBA');
+
+INSERT INTO PremioTorneo VALUES(1,'Europeo');
+INSERT INTO PremioTorneo VALUES(2,'Europeo');
+INSERT INTO PremioTorneo VALUES(3,'Europeo');
+
+---------------------------------------------------------------------
+
+CREATE TABLE Sponsor(
+	ID decimal(2,0) PRIMARY KEY,
+	nome varchar(40) not null
+);
+
+INSERT INTO Sponsor VALUES(1,'TIM');
+INSERT INTO Sponsor VALUES(2,'Strike');
+INSERT INTO Sponsor VALUES(3,'Regione Liguria');
+INSERT INTO Sponsor VALUES(4,'Università degli studi di Genova');
+
+CREATE TABLE SponsorTorneo (
+	ID decimal(2,0) REFERENCES Sponsor (ID),
+	NomeT varchar (25) REFERENCES Torneo(NomeT),
+	PRIMARY KEY (ID,NomeT)
+);
+
+INSERT INTO SponsorTorneo VALUES(1,'NBA');
+INSERT INTO SponsorTorneo VALUES(3,'NBA');
+
+INSERT INTO SponsorTorneo VALUES(1,'Europeo');
+INSERT INTO SponsorTorneo VALUES(4,'Europeo');
 ---------------------------------------------------------------------
 
 CREATE TABLE Impianto(
@@ -252,18 +331,5 @@ INSERT INTO Partecipa VALUES (2,1);
 INSERT INTO Partecipa VALUES (3,2);
 INSERT INTO Partecipa VALUES (1,2);
 
-------------------------------------------------------------------
--- Trigger che impone che solo squadre aventi nomi differenti possono partecipare allo stesso Torneo
-
-CREATE TABLE Prende_parte (
-	Squadra_ID decimal (5,0) REFERENCES Squadra(ID),
-	Torneo_ID decimal (5,0) REFERENCES Evento (ID),
-	PRIMARY KEY(Squadra_ID, Torneo_ID)
-);
-
-INSERT INTO Prende_parte VALUES (1,1);
-INSERT INTO Prende_parte VALUES (2,1);
-INSERT INTO Prende_parte VALUES (3,2);
-INSERT INTO Prende_parte VALUES (1,2);
-
 -------------------------------------------------------------------
+
