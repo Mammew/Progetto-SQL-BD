@@ -1,3 +1,4 @@
+set search_path to 'UniGeSocialSport_p'
 set datestyle to "DMY";
 
 CREATE TABLE Utente(
@@ -172,7 +173,7 @@ INSERT INTO Evento VALUES (3, current_date, '22/06/2024', 'false' , 2, 'FIVB', '
 
 
 ---------------------------------------------------------------------------------------------------
-CREATE OR REPLACE FUNCTION not_in_this_event(Sostituto varchar, Evento decimal)
+CREATE OR REPLACE FUNCTION user_not_in_this_event(Sostituto varchar, Evento decimal)
 RETURNS boolean
 AS $$
 BEGIN
@@ -195,7 +196,7 @@ LANGUAGE plpgsql;
 CREATE TABLE Iscrive(
 	Username varchar(25) REFERENCES Utente(Username),
 	ID decimal(5,0) REFERENCES Evento(ID),
-	Sostituto varchar (25) REFERENCES Utente(Username) check (not_in_this_event(Sostituto, ID)),
+	Sostituto varchar (25) REFERENCES Utente(Username) check (user_not_in_this_event(Sostituto, ID)),
 	stato varchar(10) check (stato in ('rifiutato','accettato')),
 	data date not null default current_date,
 	ruolo varchar(10) not null check (ruolo in ('giocatore','arbitro')),
@@ -211,3 +212,32 @@ INSERT INTO Iscrive VALUES ('user456',3,null,null,current_date,'giocatore',null,
 INSERT INTO Iscrive VALUES ('user456',2,null,null,current_date,'giocatore',null,null);
 
 -----------------------------------------------------------------
+-- Trigger che impone che solo squadre con nomi differenti possono iscriversi allo stesso evento
+
+CREATE TABLE Partecipa (
+	Squadra_ID decimal (5,0) REFERENCES Squadra(ID),
+	Evento_ID decimal (5,0) REFERENCES Evento (ID),
+	punti_segnati decimal(3,0),
+	PRIMARY KEY(Squadra_ID, Evento_ID)
+);
+
+INSERT INTO Partecipa VALUES (1,1);
+INSERT INTO Partecipa VALUES (2,1);
+INSERT INTO Partecipa VALUES (3,2);
+INSERT INTO Partecipa VALUES (1,2);
+
+------------------------------------------------------------------
+-- Trigger che impone che solo squadre aventi nomi differenti possono partecipare allo stesso Torneo
+
+CREATE TABLE Prende_parte (
+	Squadra_ID decimal (5,0) REFERENCES Squadra(ID),
+	Torneo_ID decimal (5,0) REFERENCES Evento (ID),
+	PRIMARY KEY(Squadra_ID, Torneo_ID)
+);
+
+INSERT INTO Prende_parte VALUES (1,1);
+INSERT INTO Prende_parte VALUES (2,1);
+INSERT INTO Prende_parte VALUES (3,2);
+INSERT INTO Prende_parte VALUES (1,2);
+
+-------------------------------------------------------------------
