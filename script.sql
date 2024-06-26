@@ -91,6 +91,13 @@ INSERT INTO Squadra VALUES(6, 'SanfruBeach', 'Mondiale', 26, 11, 'rosso','aperto
 
 ------------------------------------------------------------------------------------------
 
+CREATE TABLE Note (
+	ID decimal (5,0) PRIMARY KEY,
+	Squadra_ID decimal (5,0) not null REFERENCES Squadra(ID),
+	nota varchar (100) not null
+);
+
+------------------------------------------------------------------------------------------
 CREATE TABLE Candidatura(
 	Username varchar (25) references Utente (Username),
 	Squadra decimal (5,0) references Squadra (ID),
