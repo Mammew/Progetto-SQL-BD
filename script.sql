@@ -170,7 +170,35 @@ CREATE TABLE Evento(
 INSERT INTO Evento VALUES (1, current_date, '20/06/2024', 'false' , 1, 'NBA', 'calcio Gambaro', 'user123');
 INSERT INTO Evento VALUES (2, current_date, '21/06/2024', 'TRUE' , 3, 'Roland garros', 'tennis Puggia', 'user123');
 INSERT INTO Evento VALUES (3, current_date, '22/06/2024', 'false' , 2, 'FIVB', 'pallavolo Puggia', 'user789');
+---------------------------------------------------------------------------------------------------
 
+CREATE TABLE Prestazione(
+	Username varchar (25) REFERENCES Utente (Username),
+	Evento_ID decimal (5,0) REFERENCES Evento (ID),
+	Valutante varchar (25) REFERENCES Utente (Username),
+	valutazione decimal (3,0) not null,
+	commento varchar(100),
+	PRIMARY KEY (Username, Evento_ID, Valutante)
+);
+
+-- L'inserimento all'interno della tabella è possibile solamente in data successiva a quella dell'Evento.
+-- Implementabile tramite Trigger.
+
+-- INSERT INTO Prestazione VALUES();
+
+---------------------------------------------------------------------------------------------------
+
+CREATE TABLE Punti_Segnati(
+	Username varchar (25) REFERENCES Utente(Username),
+	Evento_ID decimal (5,0) REFERENCES Evento(ID),
+	punti_Goal decimal(3,0) not null,
+	PRIMARY KEY (Username, Evento_ID)
+);
+
+-- Eventuali INSERT nella tabella potranno essere effettuate solamente in data posteriore all'Evento a cui si fa riferimento
+-- Implementabile tramite Trigger
+
+--INSERT INTO Punti_segnati VALUES ();
 
 ---------------------------------------------------------------------------------------------------
 CREATE OR REPLACE FUNCTION user_not_in_this_event(Sostituto varchar, Evento decimal)
@@ -190,8 +218,6 @@ END $$
 LANGUAGE plpgsql;
 
 --DROP FUNCTION not_in_this_event(varchar, decimal);
-
-
 
 CREATE TABLE Iscrive(
 	Username varchar(25) REFERENCES Utente(Username),
