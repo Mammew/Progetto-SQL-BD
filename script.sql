@@ -45,8 +45,8 @@ INSERT INTO Categoria VALUES(4, 14, 'si gioca 7 Vs 7 regole del Calcio a 7', fal
 
 
 CREATE TABLE Liv_Utente(
-	ID decimal (5,0) REFERENCES Categoria (ID),
-	Username  varchar (25) REFERENCES Utente (Username),
+	ID decimal (5,0) not null REFERENCES Categoria (ID),
+	Username  varchar (25) not null REFERENCES Utente (Username),
 	livello decimal (3,0) not null check (livello  between 1 and 100),
 	PRIMARY KEY(ID, Username)
 );
@@ -74,6 +74,7 @@ CREATE TABLE Squadra(
 	ID decimal (5,0) PRIMARY KEY,
 	NomeS varchar(25) not null,
 	Torneo varchar(20) not null REFERENCES Torneo (NomeT), -- forse serve il not null
+	Organizzatore varchar (25) REFERENCES Utente(Username) CHECK (is_organizzatore_premium(Organizzatore)),
 	num_giocatori_max decimal (2,0) not null,
 	num_giocatori_min decimal (2,0) not null,
 	colore_maglia varchar (15),
@@ -82,12 +83,12 @@ CREATE TABLE Squadra(
 	UNIQUE(NomeS,Torneo)
 );
 
-INSERT INTO Squadra VALUES(1, 'Boston', 'NBA', 16, 5, 'verde','aperto');
-INSERT INTO Squadra VALUES(2, 'NonTroppoAtletici', 'FIVB', 14, 6, 'bianco','aperto');
-INSERT INTO Squadra VALUES(3, 'Cardedu', 'Roland garros', 2, 2, 'blu','aperto');
-INSERT INTO Squadra VALUES(4, 'SanfruBeach', 'Europeo', 26, 11, 'rosso','aperto');
-INSERT INTO Squadra VALUES(5, 'Boston', 'FIBA', 26, 11, 'rosso','aperto');
-INSERT INTO Squadra VALUES(6, 'SanfruBeach', 'Mondiale', 26, 11, 'rosso','aperto');
+INSERT INTO Squadra VALUES(1, 'Boston', 'NBA', 'user123', 16, 5, 'verde','aperto');
+INSERT INTO Squadra VALUES(2, 'NonTroppoAtletici', 'FIVB', 'user123', 14, 6, 'bianco','aperto');
+INSERT INTO Squadra VALUES(3, 'Cardedu', 'Roland garros', 'user789', 2, 2, 'blu','aperto');
+INSERT INTO Squadra VALUES(4, 'SanfruBeach', 'Europeo', 'user789', 26, 11, 'rosso','aperto');
+INSERT INTO Squadra VALUES(5, 'Boston', 'FIBA', 'user123', 26, 11, 'rosso','aperto');
+INSERT INTO Squadra VALUES(6, 'SanfruBeach', 'Mondiale', 'user789', 26, 11, 'rosso','aperto');
 
 ------------------------------------------------------------------------------------------
 
@@ -99,8 +100,8 @@ CREATE TABLE Note (
 
 ------------------------------------------------------------------------------------------
 CREATE TABLE Candidatura(
-	Username varchar (25) references Utente (Username),
-	Squadra decimal (5,0) references Squadra (ID),
+	Username varchar (25) not null REFERENCES Utente (Username),
+	Squadra decimal (5,0) not null REFERENCES Squadra (ID),
 	stato varchar(9) check (stato in ('accettato','rifiutato')),
 	data date default current_date,
 	PRIMARY KEY(Username,Squadra)
@@ -306,8 +307,8 @@ LANGUAGE plpgsql;
 --DROP FUNCTION not_in_this_event(varchar, decimal);
 
 CREATE TABLE Iscrive(
-	Username varchar(25) REFERENCES Utente(Username),
-	ID decimal(5,0) REFERENCES Evento(ID),
+	Username varchar(25) not null REFERENCES Utente(Username),
+	ID decimal(5,0) not null REFERENCES Evento(ID),
 	Sostituto varchar (25) REFERENCES Utente(Username) check (user_not_in_this_event(Sostituto, ID)),
 	stato varchar(10) check (stato in ('rifiutato','accettato')),
 	data date not null default current_date,
@@ -319,7 +320,7 @@ CREATE TABLE Iscrive(
 );
 
 INSERT INTO Iscrive VALUES ('user123',1,null,null,current_date,'giocatore',null,null);
-INSERT INTO Iscrive VALUES ('user123',2,null,null,current_date,'giocatore',null,null);
+INSERT INTO Iscrive VALUES ('user123',15,null,null,current_date,'giocatore',null,null);
 INSERT INTO Iscrive VALUES ('user456',3,null,null,current_date,'giocatore',null,null);
 INSERT INTO Iscrive VALUES ('user456',2,null,null,current_date,'giocatore',null,null);
 
