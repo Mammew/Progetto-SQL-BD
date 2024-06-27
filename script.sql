@@ -33,15 +33,16 @@ VALUES ('user789', true,'Economia', 'Verdi', 'Giuseppe', 222333444, 'pass1234', 
 
 CREATE TABLE Categoria(
 	ID decimal (5,0) PRIMARY KEY,
+	nomeC varchar (20) not null,
 	num_giocatori decimal (2,0) NOT NULL,
 	regolamento varchar (100) not null,
 	foto boolean NOT NULL
 );
 
-INSERT INTO Categoria VALUES(1, 10, 'si gioca 5 Vs 5 regole del Basket FIBA', false);
-INSERT INTO Categoria VALUES(2, 12, 'si gioca 6 Vs 6 regole della pallavolo classica', false);
-INSERT INTO Categoria VALUES(3, 2, 'si gioca 1 Vs 1 regole del Tennis singolo', false);
-INSERT INTO Categoria VALUES(4, 14, 'si gioca 7 Vs 7 regole del Calcio a 7', false);
+INSERT INTO Categoria VALUES(1,'Basket' ,10, 'si gioca 5 Vs 5 regole del Basket FIBA', false);
+INSERT INTO Categoria VALUES(2,'Pallavolo' ,12, 'si gioca 6 Vs 6 regole della pallavolo classica', false);
+INSERT INTO Categoria VALUES(3,'Tennis singolo' ,2, 'si gioca 1 Vs 1 regole del Tennis singolo', false);
+INSERT INTO Categoria VALUES(4,'Calcio a 7' ,14, 'si gioca 7 Vs 7 regole del Calcio a 7', false);
 
 
 CREATE TABLE Liv_Utente(
