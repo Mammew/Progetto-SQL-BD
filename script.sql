@@ -1,4 +1,5 @@
-set search_path to 'UniGeSocialSport_p'
+CREATE SCHEMA "UniGeSocialSport_p";
+set search_path to 'UniGeSocialSport_p';
 set datestyle to "DMY";
 
 CREATE TABLE Utente(
@@ -68,6 +69,40 @@ INSERT INTO Liv_Utente VALUES(1, 'user789', 20);
 INSERT INTO Liv_Utente VALUES(2, 'user789', 60);
 INSERT INTO Liv_Utente VALUES(3, 'user789', 70);
 INSERT INTO Liv_Utente VALUES(4, 'user789', 40);
+------------------------------------------------------------------------
+CREATE OR REPLACE FUNCTION is_organizzatore_premium(organizzatore varchar)
+RETURNS boolean
+AS $$
+DECLARE
+  is_premium boolean;
+BEGIN
+  SELECT premium INTO is_premium
+  FROM Utente
+  WHERE Username = organizzatore;
+
+  IF NOT is_premium THEN
+    RETURN FALSE;
+  ELSE
+    RETURN TRUE;
+  END IF;
+END $$
+LANGUAGE plpgsql;
+
+
+CREATE TABLE Torneo (
+	NomeT varchar (20) PRIMARY KEY,
+	data_limite date not null check( data_limite > current_date),
+	Organizzatore varchar(25) not null REFERENCES Utente(Username) CHECK (is_organizzatore_premium(Organizzatore)), 
+	descrizione varchar (100)
+);
+
+INSERT INTO Torneo VALUES ('Roland garros', '25/08/2024','user123' ,'Torneo Tennis su terra rossa');
+INSERT INTO Torneo VALUES ('FIVB',' 25/08/2024', 'user789', 'Torneo Pallavolo');
+INSERT INTO Torneo VALUES ('Europeo', '1/08/2024', 'user789', 'Torneo Calcio a 7');
+INSERT INTO Torneo VALUES ('NBA', '10/07/2024', 'user123', 'Torneo Basket indor');
+INSERT INTO Torneo VALUES ('Mondiale', '1/08/2025', 'user123', 'Torneo Calcio a 7');
+INSERT INTO Torneo VALUES ('FIBA', '1/08/2025', 'user123', 'Torneo Basket indor');
+
 
 -------------------------------------------------------------------------
 
@@ -117,40 +152,6 @@ INSERT INTO Candidatura VALUES('user456', 2);
 INSERT INTO Candidatura VALUES('user456', 3);
 INSERT INTO Candidatura VALUES('user456', 4);
 INSERT INTO Candidatura VALUES('user789', 2);
-
----------------------------------------------------------------------
-
-CREATE OR REPLACE FUNCTION is_organizzatore_premium(organizzatore varchar)
-RETURNS boolean
-AS $$
-DECLARE
-  is_premium boolean;
-BEGIN
-  SELECT premium INTO is_premium
-  FROM Utente
-  WHERE Username = organizzatore;
-
-  IF NOT is_premium THEN
-    RETURN FALSE;
-  ELSE
-    RETURN TRUE;
-  END IF;
-END $$
-LANGUAGE plpgsql;
-
-CREATE TABLE Torneo (
-	NomeT varchar (20) PRIMARY KEY,
-	data_limite date not null check( data_limite > current_date),
-	Organizzatore varchar(25) not null REFERENCES Utente(Username) CHECK (is_organizzatore_premium(Organizzatore)), 
-	descrizione varchar (100)
-);
-
-INSERT INTO Torneo VALUES ('Roland garros', '25/08/2024','user123' ,'Torneo Tennis su terra rossa');
-INSERT INTO Torneo VALUES ('FIVB',' 25/08/2024', 'user789', 'Torneo Pallavolo');
-INSERT INTO Torneo VALUES ('Europeo', '1/08/2024', 'user789', 'Torneo Calcio a 7');
-INSERT INTO Torneo VALUES ('NBA', '10/07/2024', 'user123', 'Torneo Basket indor');
-INSERT INTO Torneo VALUES ('Mondiale', '1/08/2025', 'user123', 'Torneo Calcio a 7');
-INSERT INTO Torneo VALUES ('FIBA', '1/08/2025', 'user123', 'Torneo Basket indor');
 
 ---------------------------------------------------------------------------------
 
@@ -266,7 +267,7 @@ CREATE TABLE Prestazione(
 	Valutante varchar (25) REFERENCES Utente (Username),
 	valutazione decimal (3,0) not null,
 	commento varchar(100),
-	PRIMARY KEY (Username, Evento_ID, Valutante)
+	PRIMARY KEY (Valutato, Evento_ID, Valutante)
 );
 
 -- L'inserimento all'interno della tabella è possibile solamente in data successiva a quella dell'Evento.
@@ -321,7 +322,7 @@ CREATE TABLE Iscrive(
 );
 
 INSERT INTO Iscrive VALUES ('user123',1,null,null,current_date,'giocatore',null,null);
-INSERT INTO Iscrive VALUES ('user123',15,null,null,current_date,'giocatore',null,null);
+INSERT INTO Iscrive VALUES ('user123',2,null,null,current_date,'giocatore',null,null);
 INSERT INTO Iscrive VALUES ('user456',3,null,null,current_date,'giocatore',null,null);
 INSERT INTO Iscrive VALUES ('user456',2,null,null,current_date,'giocatore',null,null);
 
@@ -347,7 +348,7 @@ INSERT INTO Partecipa VALUES (1,2);
 evidenziando in particolare per ogni categoria il numero di tornei, il numero di eventi, 
 il numero di partecipanti coinvolti e di quanti diversi corsi di studio, 
 la durata totale (in termini di minuti) di utilizzo e la percentuale di utilizzo rispetto alla disponibilita 
-complessiva (minuti totali nel mese in cui l impianto utilizzabile) 
+complessiva (minuti totali nel mese in cui l impianto utilizzabile) */
 
 
 /*************************************************************************************************************************************************************************/ 
