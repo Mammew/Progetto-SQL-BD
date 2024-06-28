@@ -448,6 +448,20 @@ Having count(Username) >= ALL (Select count(Username)
 /*************************************************************************************************************************************************************************/ 
 
 /* inserire qui i comandi SQL per la creazione della funzione senza rimuovere la specifica nel commento precedente */ 
+Create FUNCTION is_part_of_team(Person varchar)
+RETURNS boolean
+AS $$
+BEGIN
+	IF Person IN ( Select distinct Username
+					from Candidatura
+					where stato = 'accettato')
+	THEN
+		return true;
+	ELSE
+		return false;
+	END IF;
+END $$
+LANGUAGE plpgsql;
 
 /*************************************************************************************************************************************************************************/ 
 /* 4b1: funzione che dato un giocatore ne calcoli il livello */
