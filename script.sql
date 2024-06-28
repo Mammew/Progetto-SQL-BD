@@ -29,11 +29,11 @@ VALUES ('simple2', true ,'Giurisprudenza', 'Francesca', 'Totti', 128456789, 'pas
 
 -- 2. Insert with optional fields set to default
 INSERT INTO Utente (Username, corso_di_studi, cognome, nome, telefono, password, matricola, luogoN, dataN)
-VALUES ('user456', 'Ingegneria', 'Bianchi', 'Anna', 987654321, 'secure_password', '987654321', 'Milano', '1995-07-14');
+VALUES ('user456', 'Informatica', 'Bianchi', 'Anna', 987654321, 'secure_password', '987654321', 'Milano', '1995-07-14');
 
 -- 3. Insert with boolean field set to true
 INSERT INTO Utente (Username, premium, corso_di_studi, cognome, nome, telefono, password, matricola, luogoN, dataN)
-VALUES ('user789', true,'Economia', 'Verdi', 'Giuseppe', 222333444, 'pass1234', '222333444', 'Roma', '2000-12-31');
+VALUES ('user789', true,'Giurisprudenza', 'Verdi', 'Giuseppe', 222333444, 'pass1234', '222333444', 'Roma', '2000-12-31');
 
 
 ----------------------------------------------------------------------
@@ -337,7 +337,7 @@ CREATE TABLE Iscrive(
 	PRIMARY KEY (Username, ID),
 	UNIQUE(Username,ID,Sostituto)
 );
-
+-- E' possibile iscriversi solo ad Eventi aventi il campo Torneo = NULL
 INSERT INTO Iscrive VALUES ('user123',1,null,'confermato',current_date,'giocatore',null,null);
 INSERT INTO Iscrive VALUES ('user123',2,null,'confermato',current_date,'giocatore',null,null);
 INSERT INTO Iscrive VALUES ('user123',3,null,'confermato',current_date,'giocatore',null,null);
@@ -370,7 +370,7 @@ il numero di partecipanti coinvolti e di quanti diversi corsi di studio,
 la durata totale (in termini di minuti) di utilizzo e la percentuale di utilizzo rispetto alla disponibilita 
 complessiva (minuti totali nel mese in cui l impianto utilizzabile) */
 
-/*CREATE VIEW Programma(Impianto, Mese,Numero_Torneo, Numero_Eventi, Categoria, Numero_Giocatori, 
+CREATE VIEW Programma(Impianto, Mese,Numero_Torneo, Numero_Eventi, Categoria, Numero_Giocatori, 
 					  Numero_corso_di_studi, Minuti_Tot, Percentuale_utilizzo)AS
 	Select Impianto, EXTRACT(MONTH FROM Evento.data) Mese, count(distinct NomeT) Num_Tornei, count(Evento.ID) Num_Eventi, nomeC, 
 		count(distinct Iscrive.Username) Num_Giocatori, count (distinct corso_di_studi) Num_corso_di_studi, 
@@ -379,7 +379,7 @@ complessiva (minuti totali nel mese in cui l impianto utilizzabile) */
 		join Utente on Iscrive.Username = Utente.Username
 	Where Iscrive.stato = 'confermato'
 	Group by (Impianto, Mese, nomeC, durata)
-*/
+
 /*************************************************************************************************************************************************************************/ 
 
 /* inserire qui i comandi SQL per la creazione della vista senza rimuovere la specifica nel commento precedente */ 
@@ -392,14 +392,14 @@ complessiva (minuti totali nel mese in cui l impianto utilizzabile) */
 /* 3a: Determinare gli utenti che si sono candidati come giocatori e non sono mai stati accettati e quelli che sono stati accettati tutte le volte che si sono candidati */
 /*************************************************************************************************************************************************************************/ 
 
-/*Select Username
+Select Username
 from Utente natural join Iscrive
 where stato = 'confermato'
 EXCEPT
 Select Username
 from Utente natural join Iscrive
 where stato = 'rifiutato'
-*/
+
 /* inserire qui i comandi SQL per la creazione della query senza rimuovere la specifica nel commento precedente */ 
 
 /*************************************************************************************************************************************************************************/ 
@@ -407,7 +407,7 @@ where stato = 'rifiutato'
 /*************************************************************************************************************************************************************************/ 
 
 /* inserire qui i comandi SQL per la creazione della query senza rimuovere la specifica nel commento precedente */ 
-/*
+
 Select Username
 from (Select distinct Utente.Username, Categoria
 		from Utente natural join Iscrive join Evento on Iscrive.ID = Evento.ID 
@@ -422,12 +422,22 @@ from (Select distinct Utente.Username, Categoria
 		where Candidatura.stato = 'confermato' AND Evento.data <= current_date)
 group by Username
 HAVING count (distinct Categoria) = (Select count (*) from Categoria)
-*/
+
 /*************************************************************************************************************************************************************************/ 
-/* 3c: determinare per ogni categoria il corso di laurea più attivo in tale categoria, cioè quello i cui studenti hanno partecipato al maggior numero di eventi (singoli o all�interno di tornei) di tale categoria */
+/* 3c: determinare per ogni categoria il corso di laurea più attivo in tale categoria, 
+cioè quello i cui studenti hanno partecipato al maggior numero di eventi (singoli o all'interno di tornei) di tale categoria */
 /*************************************************************************************************************************************************************************/ 
 
 /* inserire qui i comandi SQL per la creazione della query senza rimuovere la specifica nel commento precedente */ 
+
+Select distinct nomeC, corso_di_studi, count(Username)
+From Categoria join Liv_utente on Categoria.ID = Liv_utente.ID natural join Utente
+Group by nomeC, corso_di_studi
+Having count(Username) >= ALL (Select count(Username)
+						 	From Categoria join Liv_utente on Categoria.ID = Liv_utente.ID natural join Utente
+							Group by nomeC, corso_di_studi)
+
+
 
 /*************************************************************************************************************************************************************************/ 
 --4. Funzioni
