@@ -36,14 +36,15 @@ CREATE TABLE Categoria(
 	ID decimal (5,0) PRIMARY KEY,
 	nomeC varchar (20) not null,
 	num_giocatori decimal (2,0) NOT NULL,
+	durata decimal (3,0) not null,
 	regolamento varchar (100) not null,
 	foto boolean NOT NULL
 );
 
-INSERT INTO Categoria VALUES(1,'Basket' ,10, 'si gioca 5 Vs 5 regole del Basket FIBA', false);
-INSERT INTO Categoria VALUES(2,'Pallavolo' ,12, 'si gioca 6 Vs 6 regole della pallavolo classica', false);
-INSERT INTO Categoria VALUES(3,'Tennis singolo' ,2, 'si gioca 1 Vs 1 regole del Tennis singolo', false);
-INSERT INTO Categoria VALUES(4,'Calcio a 7' ,14, 'si gioca 7 Vs 7 regole del Calcio a 7', false);
+INSERT INTO Categoria VALUES(1,'Basket' ,10, 42,'si gioca 5 Vs 5 regole del Basket FIBA', false);
+INSERT INTO Categoria VALUES(2,'Pallavolo' ,12, 60, 'si gioca 6 Vs 6 regole della pallavolo classica', false);
+INSERT INTO Categoria VALUES(3,'Tennis singolo', 2, 120, 'si gioca 1 Vs 1 regole del Tennis singolo', false);
+INSERT INTO Categoria VALUES(4,'Calcio a 7' ,14, 60,'si gioca 7 Vs 7 regole del Calcio a 7', false);
 
 
 CREATE TABLE Liv_Utente(
@@ -349,13 +350,15 @@ il numero di partecipanti coinvolti e di quanti diversi corsi di studio,
 la durata totale (in termini di minuti) di utilizzo e la percentuale di utilizzo rispetto alla disponibilita 
 complessiva (minuti totali nel mese in cui l impianto utilizzabile) */
 
-CREATE VIEW Programma(Impianto, Mese,Numero_Torneo, Numero_Eventi, Categoria, Numero_Giocatori, Numero_corso_di_studi)AS
+CREATE VIEW Programma(Impianto, Mese,Numero_Torneo, Numero_Eventi, Categoria, Numero_Giocatori, 
+					  Numero_corso_di_studi, Minuti_Tot, Percentuale_utilizzo)AS
 	Select Impianto, EXTRACT(MONTH FROM Evento.data) Mese, count(distinct NomeT) Num_Tornei, count(Evento.ID) Num_Eventi, nomeC, 
-		count(distinct Iscrive.Username) Num_Giocatori, count (distinct corso_di_studi) Num_corso_di_studi
+		count(distinct Iscrive.Username) Num_Giocatori, count (distinct corso_di_studi) Num_corso_di_studi, 
+		sum(durata) Minuti_Tot, (sum(durata)/18000*100) Percentuale_utilizzo
 	From Torneo join Evento on torneo=NomeT join Categoria on Categoria = Categoria.ID join Iscrive on Evento.ID = Iscrive.ID
 		join Utente on Iscrive.Username = Utente.Username
 	Where Iscrive.stato = 'confermato'
-	Group by (Impianto, Mese, nomeC)
+	Group by (Impianto, Mese, nomeC, durata)
 
 /*************************************************************************************************************************************************************************/ 
 
@@ -369,6 +372,13 @@ CREATE VIEW Programma(Impianto, Mese,Numero_Torneo, Numero_Eventi, Categoria, Nu
 /* 3a: Determinare gli utenti che si sono candidati come giocatori e non sono mai stati accettati e quelli che sono stati accettati tutte le volte che si sono candidati */
 /*************************************************************************************************************************************************************************/ 
 
+Select Username
+from Utente natural join Iscrive
+where stato = 'confermato'
+EXCEPT
+Select Username
+from Utente natural join Iscrive
+where stato = 'rifiutato'
 
 /* inserire qui i comandi SQL per la creazione della query senza rimuovere la specifica nel commento precedente */ 
 
@@ -380,7 +390,7 @@ CREATE VIEW Programma(Impianto, Mese,Numero_Torneo, Numero_Eventi, Categoria, Nu
 /* inserire qui i comandi SQL per la creazione della query senza rimuovere la specifica nel commento precedente */ 
 
 /*************************************************************************************************************************************************************************/ 
-/* 3c: determinare per ogni categoria il corso di laurea pi� attivo in tale categoria, cio� quello i cui studenti hanno partecipato al maggior numero di eventi (singoli o all�interno di tornei) di tale categoria */
+/* 3c: determinare per ogni categoria il corso di laurea più attivo in tale categoria, cioè quello i cui studenti hanno partecipato al maggior numero di eventi (singoli o all�interno di tornei) di tale categoria */
 /*************************************************************************************************************************************************************************/ 
 
 /* inserire qui i comandi SQL per la creazione della query senza rimuovere la specifica nel commento precedente */ 
@@ -410,16 +420,16 @@ eventi di quella categoria di genere femminile sul totale dei partecipanti prove
 /*************************************************************************************************************************************************************************/ 
 
 /*************************************************************************************************************************************************************************/ 
-/* 5a: trigger per la verifica del vincolo che non � possibile iscriversi a eventi chiusi e che lo stato di un evento sportivo diventa CHIUSO quando si raggiunge un numero di giocatori pari a quello previsto dalla categoria */
+/* 5a: trigger per la verifica del vincolo che non è possibile iscriversi a eventi chiusi e che lo stato di un evento sportivo diventa CHIUSO quando si raggiunge un numero di giocatori pari a quello previsto dalla categoria */
 /*************************************************************************************************************************************************************************/ 
 
 /* inserire qui i comandi SQL per la creazione del trigger senza rimuovere la specifica nel commento precedente */ 
 
 /*************************************************************************************************************************************************************************/ 
-/* 5b1: trigger che gestisce la sede di un evento: se la sede � disponibile nel periodo di svolgimento dell�evento la sede viene confermata altrimenti viene individuata una sede alternativa: 
-tra gli impianti disponibili nel periodo di svolgimento dell�evento si seleziona quello meno utilizzato nel mese in corso (vedi vista Programma) */
+/* 5b1: trigger che gestisce la sede di un evento: se la sede è disponibile nel periodo di svolgimento dell'evento la sede viene confermata altrimenti viene individuata una sede alternativa: 
+tra gli impianti disponibili nel periodo di svolgimento dell'evento si seleziona quello meno utilizzato nel mese in corso (vedi vista Programma) */
 
-/* 5b2: trigger per il mantenimento dell�attributo derivato livello */
+/* 5b2: trigger per il mantenimento dell'attributo derivato livello */
 /*************************************************************************************************************************************************************************/ 
 
 /* inserire qui i comandi SQL per la creazione del trigger lasciando la specifica nel commento precedente corrispondente al trigger realizzato tra le due alternative proposte per b.,
