@@ -465,7 +465,18 @@ LANGUAGE plpgsql;
 
 /*************************************************************************************************************************************************************************/ 
 /* 4b1: funzione che dato un giocatore ne calcoli il livello */
-
+/*
+	calcolo la media delle valutazioni la peso in centesimi e ottengo il mio livello
+	se ho perso l'ultima partita al mio livello in centesimo sottagraggo 3
+	se ho il flag affidabile a false la mia valutazione sarà inferiore di 5
+*/
+CREATE FUNCTION user_category_level(User varchar, category decimal)
+RETURN DECIMAL
+AS $$
+BEGIN
+	
+END $$
+LANGUAGE plpgsql;
 /* 4b2: funzione corrispondente alla seguente query parametrica: data una categoria e un corso di studi, determinare la frazione di partecipanti a 
 eventi di quella categoria di genere femminile sul totale dei partecipanti provenienti da quel corso di studi */
 /*************************************************************************************************************************************************************************/ 
