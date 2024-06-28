@@ -243,7 +243,6 @@ INSERT INTO Impianto VALUES('pallavolo Puggia','valletta puggia',998866523,'pall
 
 ------------------------------------------------------------------------------------------------------
 
-
 CREATE TABLE Evento(
 	ID decimal (5,0) PRIMARY KEY,
 	data date not null,
@@ -256,7 +255,7 @@ CREATE TABLE Evento(
 	stato varchar(6) not null default 'aperto' check (stato in ('aperto','chiuso'))
 );
 
-INSERT INTO Evento VALUES (1, current_date, '20/06/2024', 'false' , 1, 'NBA', 'calcio Gambaro', 'user123');
+INSERT INTO Evento VALUES (1, current_date, '20/06/2024', 'false' , 1, 'NBA', 'basket Puggia', 'user123');
 INSERT INTO Evento VALUES (2, current_date, '21/06/2024', 'TRUE' , 3, 'Roland garros', 'tennis Puggia', 'user123');
 INSERT INTO Evento VALUES (3, current_date, '22/06/2024', 'false' , 2, 'FIVB', 'pallavolo Puggia', 'user789');
 ---------------------------------------------------------------------------------------------------
@@ -312,7 +311,7 @@ CREATE TABLE Iscrive(
 	Username varchar(25) not null REFERENCES Utente(Username),
 	ID decimal(5,0) not null REFERENCES Evento(ID),
 	Sostituto varchar (25) REFERENCES Utente(Username) check (user_not_in_this_event(Sostituto, ID)),
-	stato varchar(10) check (stato in ('rifiutato','accettato')),
+	stato varchar(10) check (stato in ('rifiutato','confermato')),
 	data date not null default current_date,
 	ruolo varchar(10) not null check (ruolo in ('giocatore','arbitro')),
 	ritardo boolean,
@@ -321,10 +320,10 @@ CREATE TABLE Iscrive(
 	UNIQUE(Username,ID,Sostituto)
 );
 
-INSERT INTO Iscrive VALUES ('user123',1,null,null,current_date,'giocatore',null,null);
-INSERT INTO Iscrive VALUES ('user123',2,null,null,current_date,'giocatore',null,null);
-INSERT INTO Iscrive VALUES ('user456',3,null,null,current_date,'giocatore',null,null);
-INSERT INTO Iscrive VALUES ('user456',2,null,null,current_date,'giocatore',null,null);
+INSERT INTO Iscrive VALUES ('user123',1,null,'confermato',current_date,'giocatore',null,null);
+INSERT INTO Iscrive VALUES ('user123',2,null,'rifiutato',current_date,'giocatore',null,null);
+INSERT INTO Iscrive VALUES ('user456',3,null,'confermato',current_date,'giocatore',null,null);
+INSERT INTO Iscrive VALUES ('user456',2,null,'confermato',current_date,'giocatore',null,null);
 
 -----------------------------------------------------------------
 -- Trigger che impone che solo squadre con nomi differenti possono iscriversi allo stesso evento
@@ -350,6 +349,13 @@ il numero di partecipanti coinvolti e di quanti diversi corsi di studio,
 la durata totale (in termini di minuti) di utilizzo e la percentuale di utilizzo rispetto alla disponibilita 
 complessiva (minuti totali nel mese in cui l impianto utilizzabile) */
 
+CREATE VIEW Programma(Impianto, Mese,Numero_Torneo, Numero_Eventi, Categoria, Numero_Giocatori, Numero_corso_di_studi)AS
+	Select Impianto, EXTRACT(MONTH FROM Evento.data) Mese, count(distinct NomeT) Num_Tornei, count(Evento.ID) Num_Eventi, nomeC, 
+		count(distinct Iscrive.Username) Num_Giocatori, count (distinct corso_di_studi) Num_corso_di_studi
+	From Torneo join Evento on torneo=NomeT join Categoria on Categoria = Categoria.ID join Iscrive on Evento.ID = Iscrive.ID
+		join Utente on Iscrive.Username = Utente.Username
+	Where Iscrive.stato = 'confermato'
+	Group by (Impianto, Mese, nomeC)
 
 /*************************************************************************************************************************************************************************/ 
 
@@ -392,7 +398,8 @@ complessiva (minuti totali nel mese in cui l impianto utilizzabile) */
 /*************************************************************************************************************************************************************************/ 
 /* 4b1: funzione che dato un giocatore ne calcoli il livello */
 
-/* 4b2: funzione corrispondente alla seguente query parametrica: data una categoria e un corso di studi, determinare la frazione di partecipanti a eventi di quella categoria di genere femminile sul totale dei partecipanti provenienti da quel corso di studi */
+/* 4b2: funzione corrispondente alla seguente query parametrica: data una categoria e un corso di studi, determinare la frazione di partecipanti a 
+eventi di quella categoria di genere femminile sul totale dei partecipanti provenienti da quel corso di studi */
 /*************************************************************************************************************************************************************************/ 
 
 /* inserire qui i comandi SQL per la creazione della funzione lasciando la specifica nel commento precedente corrispondente alla funzione realizzata tra le due alternative proposte per b., a seconda che il livello del giocatore sia memorizzato o meno */ 
@@ -409,9 +416,11 @@ complessiva (minuti totali nel mese in cui l impianto utilizzabile) */
 /* inserire qui i comandi SQL per la creazione del trigger senza rimuovere la specifica nel commento precedente */ 
 
 /*************************************************************************************************************************************************************************/ 
-/* 5b1: trigger che gestisce la sede di un evento: se la sede � disponibile nel periodo di svolgimento dell�evento la sede viene confermata altrimenti viene individuata una sede alternativa: tra gli impianti disponibili nel periodo di svolgimento dell�evento si seleziona quello meno utilizzato nel mese in corso (vedi vista Programma) */
+/* 5b1: trigger che gestisce la sede di un evento: se la sede � disponibile nel periodo di svolgimento dell�evento la sede viene confermata altrimenti viene individuata una sede alternativa: 
+tra gli impianti disponibili nel periodo di svolgimento dell�evento si seleziona quello meno utilizzato nel mese in corso (vedi vista Programma) */
 
 /* 5b2: trigger per il mantenimento dell�attributo derivato livello */
 /*************************************************************************************************************************************************************************/ 
 
-/* inserire qui i comandi SQL per la creazione del trigger lasciando la specifica nel commento precedente corrispondente al trigger realizzato tra le due alternative proposte per b., a seconda che il livello del giocatore sia memorizzato o meno */ 
+/* inserire qui i comandi SQL per la creazione del trigger lasciando la specifica nel commento precedente corrispondente al trigger realizzato tra le due alternative proposte per b.,
+a seconda che il livello del giocatore sia memorizzato o meno */ 
