@@ -21,6 +21,12 @@ CREATE TABLE Utente(
 INSERT INTO Utente (Username, premium, corso_di_studi, cognome, nome, telefono, password, matricola, luogoN, dataN)
 VALUES ('user123', true ,'Informatica', 'Rossi', 'Mario', 123456789, 'password123', '123456789', 'Torino', '1990-01-01');
 
+INSERT INTO Utente (Username, premium, corso_di_studi, cognome, nome, telefono, password, matricola, luogoN, dataN)
+VALUES ('FQ30', true ,'Matematica statistica', 'Quirolo', 'Federico', 163456789, 'password123', '133756789', 'Genova', '2002-12-30');
+
+INSERT INTO Utente (Username, premium, corso_di_studi, cognome, nome, telefono, password, matricola, luogoN, dataN)
+VALUES ('simple2', true ,'Giurisprudenza', 'Francesca', 'Totti', 128456789, 'password123', '103456789', 'Torino', '1999-01-01');
+
 -- 2. Insert with optional fields set to default
 INSERT INTO Utente (Username, corso_di_studi, cognome, nome, telefono, password, matricola, luogoN, dataN)
 VALUES ('user456', 'Ingegneria', 'Bianchi', 'Anna', 987654321, 'secure_password', '987654321', 'Milano', '1995-07-14');
@@ -58,6 +64,16 @@ INSERT INTO Liv_Utente VALUES(1, 'user123', 50);
 INSERT INTO Liv_Utente VALUES(2, 'user123', 50);
 INSERT INTO Liv_Utente VALUES(3, 'user123', 50);
 INSERT INTO Liv_Utente VALUES(4, 'user123', 50);
+
+INSERT INTO Liv_Utente VALUES(1, 'FQ30', 90);
+INSERT INTO Liv_Utente VALUES(2, 'FQ30', 90);
+INSERT INTO Liv_Utente VALUES(3, 'FQ30', 90);
+INSERT INTO Liv_Utente VALUES(4, 'FQ30', 90);
+
+INSERT INTO Liv_Utente VALUES(1, 'simple2', 60);
+INSERT INTO Liv_Utente VALUES(2, 'simple2', 60);
+INSERT INTO Liv_Utente VALUES(3, 'simple2', 60);
+INSERT INTO Liv_Utente VALUES(4, 'simple2', 60);
 
 
 INSERT INTO Liv_Utente VALUES(1, 'user456', 50);
@@ -104,7 +120,6 @@ INSERT INTO Torneo VALUES ('NBA', '10/07/2024', 'user123', 'Torneo Basket indor'
 INSERT INTO Torneo VALUES ('Mondiale', '1/08/2025', 'user123', 'Torneo Calcio a 7');
 INSERT INTO Torneo VALUES ('FIBA', '1/08/2025', 'user123', 'Torneo Basket indor');
 
-
 -------------------------------------------------------------------------
 
 CREATE TABLE Squadra(
@@ -126,7 +141,7 @@ INSERT INTO Squadra VALUES(3, 'Cardedu', 'Roland garros', 'user789', 2, 2, 'blu'
 INSERT INTO Squadra VALUES(4, 'SanfruBeach', 'Europeo', 'user789', 26, 11, 'rosso','aperto');
 INSERT INTO Squadra VALUES(5, 'Boston', 'FIBA', 'user123', 26, 11, 'rosso','aperto');
 INSERT INTO Squadra VALUES(6, 'SanfruBeach', 'Mondiale', 'user789', 26, 11, 'rosso','aperto');
-
+INSERT INTO Squadra VALUES(7, 'Los Angeles', 'NBA', 'user789', 16, 5, 'viola','aperto');
 ------------------------------------------------------------------------------------------
 
 CREATE TABLE Note (
@@ -144,15 +159,15 @@ CREATE TABLE Candidatura(
 	PRIMARY KEY(Username,Squadra)
 );
 
-INSERT INTO Candidatura VALUES('user123', 1);
-INSERT INTO Candidatura VALUES('user123', 2);
-INSERT INTO Candidatura VALUES('user123', 3);
-INSERT INTO Candidatura VALUES('user123', 4);
+INSERT INTO Candidatura VALUES('user123', 1,'accettato');
+INSERT INTO Candidatura VALUES('user123', 2,'accettato');
+INSERT INTO Candidatura VALUES('user123', 3,'accettato');
+INSERT INTO Candidatura VALUES('user123', 4,'accettato');
 INSERT INTO Candidatura VALUES('user456', 1);
 INSERT INTO Candidatura VALUES('user456', 2);
 INSERT INTO Candidatura VALUES('user456', 3);
-INSERT INTO Candidatura VALUES('user456', 4);
-INSERT INTO Candidatura VALUES('user789', 2);
+INSERT INTO Candidatura VALUES('user456', 4,'accettato');
+INSERT INTO Candidatura VALUES('user789', 2,'accettato');
 
 ---------------------------------------------------------------------------------
 
@@ -255,10 +270,12 @@ CREATE TABLE Evento(
 	Organizzatore varchar(25) not null REFERENCES Utente(Username) CHECK (is_organizzatore_premium(Organizzatore)),
 	stato varchar(6) not null default 'aperto' check (stato in ('aperto','chiuso'))
 );
-
-INSERT INTO Evento VALUES (1, current_date, '20/06/2024', 'false' , 1, 'NBA', 'basket Puggia', 'user123');
+INSERT INTO Evento VALUES (1, current_date, '20/06/2024', 'false' , 1, null, 'basket Puggia', 'user123');
 INSERT INTO Evento VALUES (2, current_date, '21/06/2024', 'TRUE' , 3, 'Roland garros', 'tennis Puggia', 'user123');
 INSERT INTO Evento VALUES (3, current_date, '22/06/2024', 'false' , 2, 'FIVB', 'pallavolo Puggia', 'user789');
+INSERT INTO Evento VALUES (4, current_date, '22/06/2024', 'false' , 4, 'Mondiale', 'calcio Gambaro', 'user789');
+INSERT INTO Evento VALUES (5, current_date, '22/06/2024', 'false' , 1, 'NBA', 'basket Puggia', 'user789');
+INSERT INTO Evento VALUES (6, '29/06/2024', '22/06/2024', 'false' , 1, 'NBA', 'basket Puggia', 'user789');
 ---------------------------------------------------------------------------------------------------
 
 CREATE TABLE Prestazione(
@@ -322,7 +339,10 @@ CREATE TABLE Iscrive(
 );
 
 INSERT INTO Iscrive VALUES ('user123',1,null,'confermato',current_date,'giocatore',null,null);
-INSERT INTO Iscrive VALUES ('user123',2,null,'rifiutato',current_date,'giocatore',null,null);
+INSERT INTO Iscrive VALUES ('user123',2,null,'confermato',current_date,'giocatore',null,null);
+INSERT INTO Iscrive VALUES ('user123',3,null,'confermato',current_date,'giocatore',null,null);
+INSERT INTO Iscrive VALUES ('user123',4,null,'confermato',current_date,'giocatore',null,null);
+
 INSERT INTO Iscrive VALUES ('user456',3,null,'confermato',current_date,'giocatore',null,null);
 INSERT INTO Iscrive VALUES ('user456',2,null,'confermato',current_date,'giocatore',null,null);
 
@@ -336,10 +356,10 @@ CREATE TABLE Partecipa (
 	PRIMARY KEY(Squadra_ID, Evento_ID)
 );
 
-INSERT INTO Partecipa VALUES (1,1);
-INSERT INTO Partecipa VALUES (2,1);
+INSERT INTO Partecipa VALUES (1,5);
+INSERT INTO Partecipa VALUES (2,5);
 INSERT INTO Partecipa VALUES (3,2);
-INSERT INTO Partecipa VALUES (1,2);
+INSERT INTO Partecipa VALUES (7,6);
 
 -------------------------------------------------------------------
 
@@ -350,7 +370,7 @@ il numero di partecipanti coinvolti e di quanti diversi corsi di studio,
 la durata totale (in termini di minuti) di utilizzo e la percentuale di utilizzo rispetto alla disponibilita 
 complessiva (minuti totali nel mese in cui l impianto utilizzabile) */
 
-CREATE VIEW Programma(Impianto, Mese,Numero_Torneo, Numero_Eventi, Categoria, Numero_Giocatori, 
+/*CREATE VIEW Programma(Impianto, Mese,Numero_Torneo, Numero_Eventi, Categoria, Numero_Giocatori, 
 					  Numero_corso_di_studi, Minuti_Tot, Percentuale_utilizzo)AS
 	Select Impianto, EXTRACT(MONTH FROM Evento.data) Mese, count(distinct NomeT) Num_Tornei, count(Evento.ID) Num_Eventi, nomeC, 
 		count(distinct Iscrive.Username) Num_Giocatori, count (distinct corso_di_studi) Num_corso_di_studi, 
@@ -359,7 +379,7 @@ CREATE VIEW Programma(Impianto, Mese,Numero_Torneo, Numero_Eventi, Categoria, Nu
 		join Utente on Iscrive.Username = Utente.Username
 	Where Iscrive.stato = 'confermato'
 	Group by (Impianto, Mese, nomeC, durata)
-
+*/
 /*************************************************************************************************************************************************************************/ 
 
 /* inserire qui i comandi SQL per la creazione della vista senza rimuovere la specifica nel commento precedente */ 
@@ -372,23 +392,37 @@ CREATE VIEW Programma(Impianto, Mese,Numero_Torneo, Numero_Eventi, Categoria, Nu
 /* 3a: Determinare gli utenti che si sono candidati come giocatori e non sono mai stati accettati e quelli che sono stati accettati tutte le volte che si sono candidati */
 /*************************************************************************************************************************************************************************/ 
 
-Select Username
+/*Select Username
 from Utente natural join Iscrive
 where stato = 'confermato'
 EXCEPT
 Select Username
 from Utente natural join Iscrive
 where stato = 'rifiutato'
-
+*/
 /* inserire qui i comandi SQL per la creazione della query senza rimuovere la specifica nel commento precedente */ 
 
 /*************************************************************************************************************************************************************************/ 
 /* 3b: determinare gli utenti che hanno partecipato ad almeno un evento di ogni categoria */
 /*************************************************************************************************************************************************************************/ 
 
-
 /* inserire qui i comandi SQL per la creazione della query senza rimuovere la specifica nel commento precedente */ 
-
+/*
+Select Username
+from (Select distinct Utente.Username, Categoria
+		from Utente natural join Iscrive join Evento on Iscrive.ID = Evento.ID 
+		where Iscrive.stato = 'confermato' AND Evento.data <= current_date)
+group by Username
+HAVING count (distinct Categoria) = (Select count (*) from Categoria)
+Union
+Select Username
+from (Select distinct Utente.Username, Categoria
+		from Utente natural join Candidatura join Partecipa on Candidatura.Squadra = Squadra_ID
+	  		 join Evento on Evento_ID = Evento.ID
+		where Candidatura.stato = 'confermato' AND Evento.data <= current_date)
+group by Username
+HAVING count (distinct Categoria) = (Select count (*) from Categoria)
+*/
 /*************************************************************************************************************************************************************************/ 
 /* 3c: determinare per ogni categoria il corso di laurea più attivo in tale categoria, cioè quello i cui studenti hanno partecipato al maggior numero di eventi (singoli o all�interno di tornei) di tale categoria */
 /*************************************************************************************************************************************************************************/ 
