@@ -60,15 +60,16 @@ CREATE TABLE Liv_Utente(
 	PRIMARY KEY(ID, Username)
 );
 
-INSERT INTO Liv_Utente VALUES(1, 'user123', 50);
-INSERT INTO Liv_Utente VALUES(2, 'user123', 50);
-INSERT INTO Liv_Utente VALUES(3, 'user123', 50);
-INSERT INTO Liv_Utente VALUES(4, 'user123', 50);
+INSERT INTO Liv_Utente VALUES(1, 'user123', 60);
+INSERT INTO Liv_Utente VALUES(2, 'user123', 60);
+INSERT INTO Liv_Utente VALUES(3, 'user123', 60);
+INSERT INTO Liv_Utente VALUES(4, 'user123', 60);
 
-INSERT INTO Liv_Utente VALUES(1, 'FQ30', 90);
-INSERT INTO Liv_Utente VALUES(2, 'FQ30', 90);
-INSERT INTO Liv_Utente VALUES(3, 'FQ30', 90);
-INSERT INTO Liv_Utente VALUES(4, 'FQ30', 90);
+INSERT INTO Liv_Utente VALUES(1, 'FQ30', 60);
+INSERT INTO Liv_Utente VALUES(2, 'FQ30', 60);
+INSERT INTO Liv_Utente VALUES(3, 'FQ30', 60);
+INSERT INTO Liv_Utente VALUES(4, 'FQ30', 60);
+
 
 INSERT INTO Liv_Utente VALUES(1, 'simple2', 60);
 INSERT INTO Liv_Utente VALUES(2, 'simple2', 60);
@@ -76,16 +77,16 @@ INSERT INTO Liv_Utente VALUES(3, 'simple2', 60);
 INSERT INTO Liv_Utente VALUES(4, 'simple2', 60);
 
 
-INSERT INTO Liv_Utente VALUES(1, 'user456', 50);
-INSERT INTO Liv_Utente VALUES(2, 'user456', 20);
-INSERT INTO Liv_Utente VALUES(3, 'user456', 30);
+INSERT INTO Liv_Utente VALUES(1, 'user456', 60);
+INSERT INTO Liv_Utente VALUES(2, 'user456', 60);
+INSERT INTO Liv_Utente VALUES(3, 'user456', 60);
 INSERT INTO Liv_Utente VALUES(4, 'user456', 60);
 
 
-INSERT INTO Liv_Utente VALUES(1, 'user789', 20);
+INSERT INTO Liv_Utente VALUES(1, 'user789', 60);
 INSERT INTO Liv_Utente VALUES(2, 'user789', 60);
-INSERT INTO Liv_Utente VALUES(3, 'user789', 70);
-INSERT INTO Liv_Utente VALUES(4, 'user789', 40);
+INSERT INTO Liv_Utente VALUES(3, 'user789', 60);
+INSERT INTO Liv_Utente VALUES(4, 'user789', 60);
 ------------------------------------------------------------------------
 CREATE OR REPLACE FUNCTION is_organizzatore_premium(organizzatore varchar)
 RETURNS boolean
@@ -270,6 +271,8 @@ CREATE TABLE Evento(
 	Organizzatore varchar(25) not null REFERENCES Utente(Username) CHECK (is_organizzatore_premium(Organizzatore)),
 	stato varchar(6) not null default 'aperto' check (stato in ('aperto','chiuso'))
 );
+INSERT INTO Evento VALUES (0, '20/06/2000', '20/06/1999', 'false' , 1, null, 'basket Puggia', 'user123');
+
 INSERT INTO Evento VALUES (1, current_date, '20/06/2024', 'false' , 1, null, 'basket Puggia', 'user123');
 INSERT INTO Evento VALUES (2, current_date, '21/06/2024', 'TRUE' , 3, 'Roland garros', 'tennis Puggia', 'user123');
 INSERT INTO Evento VALUES (3, current_date, '22/06/2024', 'false' , 2, 'FIVB', 'pallavolo Puggia', 'user789');
@@ -288,9 +291,18 @@ CREATE TABLE Prestazione(
 );
 
 -- L'inserimento all'interno della tabella è possibile solamente in data successiva a quella dell'Evento.
+-- E' possibile valutare un Utente solamente in Eventi a cui ha preso parte (sia come singolo che come squadra)
 -- Implementabile tramite Trigger.
 
 -- INSERT INTO Prestazione VALUES();
+INSERT INTO Prestazione VALUES('user123',1,'user456', 7);
+INSERT INTO Prestazione VALUES('user123',1,'user789', 8);
+INSERT INTO Prestazione VALUES('user456',2,'user123', 6);
+INSERT INTO Prestazione VALUES('user456',2,'user789', 5);
+INSERT INTO Prestazione VALUES('user789',2,'user123', 6);
+INSERT INTO Prestazione VALUES('user789',2,'user456', 7);
+INSERT INTO Prestazione VALUES('user789',1,'user456', 7);
+INSERT INTO Prestazione VALUES('user789',1,'user123', 5);
 
 ---------------------------------------------------------------------------------------------------
 
@@ -338,6 +350,11 @@ CREATE TABLE Iscrive(
 	UNIQUE(Username,ID,Sostituto)
 );
 -- E' possibile iscriversi solo ad Eventi aventi il campo Torneo = NULL
+--Evento 0:
+	INSERT INTO Iscrive VALUES ('user123',0,null,'confermato','12/06/1999','giocatore',null,null);
+	INSERT INTO Iscrive VALUES ('user456',0,null,'confermato','10/06/1999','giocatore',null,null);
+	INSERT INTO Iscrive VALUES ('user789',0,null,'confermato','28/06/1999','giocatore',null,null);
+
 INSERT INTO Iscrive VALUES ('user123',1,null,'confermato',current_date,'giocatore',null,null);
 INSERT INTO Iscrive VALUES ('user123',2,null,'confermato',current_date,'giocatore',null,null);
 INSERT INTO Iscrive VALUES ('user123',3,null,'confermato',current_date,'giocatore',null,null);
@@ -345,6 +362,9 @@ INSERT INTO Iscrive VALUES ('user123',4,null,'confermato',current_date,'giocator
 
 INSERT INTO Iscrive VALUES ('user456',3,null,'confermato',current_date,'giocatore',null,null);
 INSERT INTO Iscrive VALUES ('user456',2,null,'confermato',current_date,'giocatore',null,null);
+
+INSERT INTO Iscrive VALUES ('user789',1,null,'confermato','28/06/1999','giocatore',null,null);
+INSERT INTO Iscrive VALUES ('user789',2,null,'confermato','28/06/1999','giocatore',null,null);
 
 -----------------------------------------------------------------
 -- Trigger che impone che solo squadre con nomi differenti possono iscriversi allo stesso evento
@@ -470,14 +490,105 @@ LANGUAGE plpgsql;
 	se ho perso l'ultima partita al mio livello in centesimo sottagraggo 3
 	se ho il flag affidabile a false la mia valutazione sarà inferiore di 5
 */
-CREATE FUNCTION user_category_level(User varchar, category decimal)
-RETURN DECIMAL
+/*
+	Per i risultati potremmo creare una view?
+*/
+/*
+CREATE FUNCTION user_category_level(Pers varchar, Cat decimal)
+RETURNS DECIMAL
 AS $$
+Declare
+	num_valutaz decimal;
+	sum_valutaz decimal;
+	affidabile boolean;
 BEGIN
+	--check se l'utente non è affidabile
+	Select Utente.affidabile into affidabile
+	From Utente
+	Where Username = Pers;
 	
+	--check se l'utente ha perso l'utima partita
+	(SELECT p.Squadra_ID, p.punti_segnati
+             FROM Partecipa p
+             	JOIN Evento e ON p.Evento_ID = e.ID
+             WHERE e.data = (SELECT MAX(data) FROM Evento)
+             ORDER BY p.punti_segnati DESC
+             LIMIT 1) as vincente;
+    (SELECT p.Squadra_ID, p.punti_segnati
+             FROM Partecipa p
+             	JOIN Evento e ON p.Evento_ID = e.ID
+             WHERE e.data = (SELECT MAX(data) FROM Evento)
+             ORDER BY p.punti_segnati ASC
+             LIMIT 1) as perdente;
+	
+	group by Squadra_ID, punti_segnati
+	Having Max(data)
+	
+	Select count(*) into num_valutaz
+	from Prestazione join Evento on Evento_ID = ID
+	Where Valutato = Pers AND Categoria =  Cat;
+	
+	Select sum(valutazione) into sum_valutaz
+	From Prestazione join Evento on Evento_ID = ID
+	Where Valutato = Pers AND Categoria = Cat;
+	
+	IF num_valutaz = 0
+	THEN
+		Return 60;
+	ELSE
+		IF affidabile = false
+		THEN
+			RETURN ((sum_valutaz/num_valutaz)*10)-3;
+		ELSE
+			RETURN (sum_valutaz/num_valutaz)*10;
+		END IF;
+	END IF;
 END $$
+LANGUAGE plpgsql;*/
+
+--
+
+CREATE OR REPLACE FUNCTION CalcolaEsitoUltimoEvento(Persona varchar)
+RETURNS TABLE (
+    Squadra_Vincente_ID DECIMAL(5,0),
+    Squadra_Perdente_ID DECIMAL(5,0),
+    Punti_Vincente DECIMAL(3,0),
+    Punti_Perdente DECIMAL(3,0)
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT 
+        vincente.Squadra_ID AS Squadra_Vincente_ID,
+        perdente.Squadra_ID AS Squadra_Perdente_ID,
+        vincente.punti_segnati AS Punti_Vincente,
+        perdente.punti_segnati AS Punti_Perdente
+    FROM 
+        (SELECT p.Squadra_ID, p.punti_segnati
+         FROM Partecipa p
+         	JOIN Evento e ON p.Evento_ID = e.ID
+		 	JOIN Candidatura ON Username = Persona
+         WHERE e.data = (SELECT MAX(data) FROM Evento)
+         ORDER BY p.punti_segnati DESC
+         LIMIT 1) AS vincente,
+        (SELECT p.Squadra_ID, p.punti_segnati
+         FROM Partecipa p
+         JOIN Evento e ON p.Evento_ID = e.ID
+         WHERE e.data = (SELECT MAX(data) FROM Evento)
+         ORDER BY p.punti_segnati ASC
+         LIMIT 1) AS perdente;
+END;
+$$ 
 LANGUAGE plpgsql;
-/* 4b2: funzione corrispondente alla seguente query parametrica: data una categoria e un corso di studi, determinare la frazione di partecipanti a 
+
+Select* From CalcolaEsitoUltimoEvento('user123');
+
+----
+
+
+--insert into Liv_utente VALUES (1, 'user123', user_category_level('user123',1));
+
+/* 4b2: funzione corrispondente alla seguente query parametrica: data una categoria e un corso di studi, 
+determinare la frazione di partecipanti a 
 eventi di quella categoria di genere femminile sul totale dei partecipanti provenienti da quel corso di studi */
 /*************************************************************************************************************************************************************************/ 
 
