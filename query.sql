@@ -280,7 +280,8 @@ dalla categoria */
 
 /* inserire qui i comandi SQL per la creazione del trigger senza rimuovere la specifica nel commento precedente */ 
 /* Trigger per impedire l'iscrizione a eventi chiusi*/
-CREATE OR REPLACE FUNCTION check_event_closed()
+
+CREATE FUNCTION check_event_closed()
 RETURNS TRIGGER AS $$
 BEGIN
     -- Verifica se l'evento è chiuso
@@ -298,7 +299,7 @@ EXECUTE FUNCTION check_event_closed();
 
 /*Trigger per aggiornare lo stato dell'evento a "CHIUSO"*/
 
-CREATE OR REPLACE FUNCTION close_event_if_full()
+CREATE FUNCTION close_event_if_full()
 RETURNS TRIGGER AS $$
 DECLARE
     num_giocatori_categoria INT;
