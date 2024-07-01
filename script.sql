@@ -595,14 +595,7 @@ BEGIN
 END $$
 LANGUAGE plpgsql;
 
-------------------------------------------------------------------------------
-
-Select* From CalcolaEsitoUltimoEvento('user123');
-
-----
-
-
---insert into Liv_utente VALUES (1, 'user123', user_category_level('user123',1));
+-----------------------------------------------------------------------------
 
 /* 4b2: funzione corrispondente alla seguente query parametrica: data una categoria e un corso di studi, 
 determinare la frazione di partecipanti a 
