@@ -44,25 +44,26 @@ CREATE VIEW Programma(Impianto, Mese,Numero_Torneo, Numero_Eventi, Categoria, Nu
 /*************************************************************************************************************************************************************************/ 
 -- La query è stata interpretata come candidatura alle Squadre in quanto se un Utente viene accettato allora seguirà la sua candidatura
 -- ad una squadra. Tale Squadra sarà creata nella quale vi saranno, naturlamente, tutti gli Utenti confermati per l'Evento
-(
-	Select Username User
-	from Utente natural join Candidatura
-	where stato = 'accettato'
-	EXCEPT
-	Select Username User
-	from Utente natural join Candidatura
-	where stato = 'rifiutato'
-)
-UNION
-(
-	Select u1.Username User
-	from Utente u1 natural join Candidatura c1 join Iscrive i1 on i1.Username = u1.Username
-	where c1.stato = 'rifiutato' OR i1.stato = 'rifiutato'
-	EXCEPT
-	Select u2.Username User
-	from Utente u2 natural join Candidatura c2 join Iscrive i2 on i2.Username = u2.Username
-	where c2.stato = 'accettato' OR i2.stato = 'accettato'
-)
+Select * 
+from(
+		Select Username User
+		from Utente natural join Candidatura
+		where stato = 'accettato'
+		EXCEPT
+		Select Username User
+		from Utente natural join Candidatura
+		where stato = 'rifiutato'
+	)
+	UNION
+	(
+		Select u1.Username User
+		from Utente u1 natural join Candidatura c1 join Iscrive i1 on i1.Username = u1.Username
+		where c1.stato = 'rifiutato' OR i1.stato = 'rifiutato'
+		EXCEPT
+		Select u2.Username User
+		from Utente u2 natural join Candidatura c2 join Iscrive i2 on i2.Username = u2.Username
+		where c2.stato = 'accettato' OR i2.stato = 'accettato'
+	);
 /* inserire qui i comandi SQL per la creazione della query senza rimuovere la specifica nel commento precedente */ 
 
 /*************************************************************************************************************************************************************************/ 
@@ -77,7 +78,7 @@ from (Select distinct Utente.Username, Categoria
 	  		join Candidatura on Candidatura.Username = Utente.Username 
 		where Iscrive.stato = 'confermato' OR Candidatura.stato = 'accettato' AND Evento.data <= current_date)
 group by Username
-HAVING count (distinct Categoria) = (Select count (*) from Categoria)
+HAVING count (distinct Categoria) = (Select count (*) from Categoria);
 
 /*Union
 Select Username
@@ -100,7 +101,7 @@ From Categoria join Liv_utente on Categoria.ID = Liv_utente.ID natural join Uten
 Group by nomeC, corso_di_studi
 Having count(Username) >= ALL (Select count(Username)
 						 	From Categoria join Liv_utente on Categoria.ID = Liv_utente.ID natural join Utente
-							Group by nomeC, corso_di_studi)
+							Group by nomeC, corso_di_studi);
 
 
 
@@ -229,7 +230,7 @@ LANGUAGE plpgsql;
 
 CREATE FUNCTION find_last_match(Pers varchar, Cat decimal)
 RETURNS DECIMAL
-AS$$
+AS $$
 DECLARE
 	last_event decimal;
 BEGIN
