@@ -398,7 +398,7 @@ INSERT INTO Impianto VALUES('calcio Gambaro','viale gambaro',123456789,'calciog@
 INSERT INTO Impianto VALUES('tennis Puggia','valletta puggia',222222222,'tennisp@gmail.com');
 INSERT INTO Impianto VALUES('basket Puggia','valletta puggia',223344556,'basketp@gmail.com');
 INSERT INTO Impianto VALUES('pallavolo Puggia','valletta puggia',998866523,'pallavolop@gmail.com');
----
+
 INSERT INTO Evento VALUES (0, '20/06/2000', '20/06/1999', 'false' , 1, null, 'basket Puggia', 'user123');
 
 INSERT INTO Evento VALUES (1, '22/06/2024', '20/06/2024', 'false' , 1, null, 'basket Puggia', 'user123');
@@ -456,6 +456,15 @@ INSERT INTO Partecipa VALUES (10, 9, 4);
 
 -- Partecipazione di Real Madrid (Squadra_ID = 11) all'evento Champions League (Evento_ID = 10)
 INSERT INTO Partecipa VALUES (11, 9, 2);
+
+-------------------------------------------------------------------------------
+--Insert provvisorie per provare query 3b
+INSERT INTO Evento VALUES (17, '10/06/2024', '09/06/2024', 'false', 4, 'Europeo', 'calcio Gambaro', 'user789');
+INSERT INTO Evento VALUES (18, '10/06/2024', '09/06/2024', 'false', 2, 'FIVB', 'pallavolo Puggia', 'user789');
+
+INSERT INTO Partecipa VALUES (2, 18, 67); -- Insert della Squadra NonTroppoAtletici (FIVB) all' evento 18 FIVB
+INSERT INTO Partecipa VALUES (4, 17, 3); -- Insert della Squadra SanfuBeach (Europeo) all' evento 17 Europeo
+
 ------
 --INSERT INTO Prestazione VALUES();
 INSERT INTO Prestazione VALUES('user123',1,'user456', 7);

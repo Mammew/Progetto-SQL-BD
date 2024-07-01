@@ -71,12 +71,17 @@ from(
 /*************************************************************************************************************************************************************************/ 
 
 /* inserire qui i comandi SQL per la creazione della query senza rimuovere la specifica nel commento precedente */ 
+--join Iscrive on Iscrive.Username = Utente.Username
+-- è superflua perche se ha preso parte all'evento allora è stato messo in una Squadra.
 
 Select Username
 from (Select distinct Utente.Username, Categoria
-		from Utente natural join Iscrive join Evento on Iscrive.ID = Evento.ID 
-	  		join Candidatura on Candidatura.Username = Utente.Username 
-		where (Iscrive.stato = 'confermato' OR Candidatura.stato = 'accettato' )AND Evento.data <= current_date)
+		from Utente --natural join Iscrive
+	  		join Candidatura on Candidatura.Username = Utente.Username
+	  		join Squadra on Candidatura.Squadra = Squadra.ID
+	  		join Partecipa p on p.Squadra_ID = Squadra.ID
+	  		join Evento on p.Evento_ID = Evento.ID
+		where  Candidatura.stato = 'accettato' AND Evento.data <= current_date)
 group by Username
 HAVING count (distinct Categoria) = (Select count (*) from Categoria);
 
@@ -236,7 +241,7 @@ DECLARE
 BEGIN
 	Select Evento.ID INTO last_event
 	From Utente join 
-END $$
+END $$;
 LANGUAGE plpgsql;
 
 -----------------------------------------------------------------------------
