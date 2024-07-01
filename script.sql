@@ -5,6 +5,7 @@ set datestyle to "DMY";
 CREATE TABLE Utente(
 	Username varchar (25) PRIMARY KEY,
 	premium boolean not null DEFAULT false,
+	genere varchar not null check(genere in ('M','F')),
 	corso_di_studi varchar (30) NOT NULL,
 	cognome varchar (30) not null,
 	nome varchar(15) not null,
@@ -18,23 +19,22 @@ CREATE TABLE Utente(
 	UNIQUE (telefono),
 	UNIQUE (matricola)
 );
-INSERT INTO Utente (Username, premium, corso_di_studi, cognome, nome, telefono, password, matricola, luogoN, dataN, affidabile)
-VALUES ('user123', true ,'Informatica', 'Rossi', 'Mario', 123456789, 'password123', '123456789', 'Torino', '1990-01-01',true);
+INSERT INTO Utente (Username, premium, genere,corso_di_studi, cognome, nome, telefono, password, matricola, luogoN, dataN, affidabile)
+VALUES ('user123', true,'F','Informatica', 'Rossi', 'Mario', 123456789, 'password123', '123456789', 'Torino', '1990-01-01',true);
 
-INSERT INTO Utente (Username, premium, corso_di_studi, cognome, nome, telefono, password, matricola, luogoN, dataN)
-VALUES ('FQ30', true ,'Matematica statistica', 'Quirolo', 'Federico', 163456789, 'password123', '133756789', 'Genova', '2002-12-30');
+INSERT INTO Utente (Username, premium, genere, corso_di_studi, cognome, nome, telefono, password, matricola, luogoN, dataN)
+VALUES ('FQ30', true,'M','Matematica statistica', 'Quirolo', 'Federico', 163456789, 'password123', '133756789', 'Genova', '2002-12-30');
 
-INSERT INTO Utente (Username, premium, corso_di_studi, cognome, nome, telefono, password, matricola, luogoN, dataN)
-VALUES ('simple2', true ,'Giurisprudenza', 'Francesca', 'Totti', 128456789, 'password123', '103456789', 'Torino', '1999-01-01');
+INSERT INTO Utente (Username, premium, genere, corso_di_studi, cognome, nome, telefono, password, matricola, luogoN, dataN)
+VALUES ('simple2', true,'F','Giurisprudenza', 'Francesca', 'Totti', 128456789, 'password123', '103456789', 'Torino', '1999-01-01');
 
 -- 2. Insert with optional fields set to default
-INSERT INTO Utente (Username, corso_di_studi, cognome, nome, telefono, password, matricola, luogoN, dataN, affidabile)
-VALUES ('user456', 'Informatica', 'Bianchi', 'Anna', 987654321, 'secure_password', '987654321', 'Milano', '1995-07-14', true);
+INSERT INTO Utente (Username, genere, corso_di_studi, cognome, nome, telefono, password, matricola, luogoN, dataN, affidabile)
+VALUES ('user456', 'F','Informatica', 'Bianchi', 'Anna', 987654321, 'secure_password', '987654321', 'Milano', '1995-07-14', true);
 
 -- 3. Insert with boolean field set to true
-INSERT INTO Utente (Username, premium, corso_di_studi, cognome, nome, telefono, password, matricola, luogoN, dataN)
-VALUES ('user789', true,'Giurisprudenza', 'Verdi', 'Giuseppe', 222333444, 'pass1234', '222333444', 'Roma', '2000-12-31');
-
+INSERT INTO Utente (Username, premium, genere, corso_di_studi, cognome, nome, telefono, password, matricola, luogoN, dataN)
+VALUES ('user789', true,'M','Giurisprudenza', 'Verdi', 'Giuseppe', 222333444, 'pass1234', '222333444', 'Roma', '2000-12-31');
 
 ----------------------------------------------------------------------
 
@@ -316,8 +316,11 @@ CREATE TABLE Punti_Segnati(
 -- Eventuali INSERT nella tabella potranno essere effettuate solamente in data posteriore all'Evento a cui si fa riferimento
 -- Implementabile tramite Trigger
 
---INSERT INTO Punti_segnati VALUES ();
-
+INSERT INTO Punti_segnati VALUES ('user123',5,1);
+INSERT INTO Punti_segnati VALUES ('user456',5,1);
+INSERT INTO Punti_segnati VALUES ('user789',5,1);
+INSERT INTO Punti_segnati VALUES ();
+INSERT INTO Punti_segnati VALUES ();
 ---------------------------------------------------------------------------------------------------
 CREATE OR REPLACE FUNCTION user_not_in_this_event(Sostituto varchar, Evento decimal)
 RETURNS boolean
@@ -392,12 +395,22 @@ complessiva (minuti totali nel mese in cui l impianto utilizzabile) */
 
 CREATE VIEW Programma(Impianto, Mese,Numero_Torneo, Numero_Eventi, Categoria, Numero_Giocatori, 
 					  Numero_corso_di_studi, Minuti_Tot, Percentuale_utilizzo)AS
-	Select Impianto, EXTRACT(MONTH FROM Evento.data) Mese, count(distinct NomeT) Num_Tornei, count(Evento.ID) Num_Eventi, nomeC, 
-		count(distinct Iscrive.Username) Num_Giocatori, count (distinct corso_di_studi) Num_corso_di_studi, 
-		sum(durata) Minuti_Tot, (sum(durata)/18000*100) Percentuale_utilizzo
-	From Torneo join Evento on torneo=NomeT join Categoria on Categoria = Categoria.ID join Iscrive on Evento.ID = Iscrive.ID
-		join Utente on Iscrive.Username = Utente.Username
-	Where Iscrive.stato = 'confermato'
+	Select Impianto, 
+			EXTRACT(MONTH FROM Evento.data) Mese,
+			count(distinct NomeT) Num_Tornei,
+			count(distinct Evento.ID) Num_Eventi, nomeC, 
+			count(distinct Punti_Segnati.Username) Num_Giocatori, 
+			count (distinct corso_di_studi) Num_corso_di_studi, 
+			sum(durata) Minuti_Tot, 
+			(sum(durata)/18000*100) Percentuale_utilizzo
+	From Torneo
+		join Evento on torneo=NomeT 
+		join Categoria on Categoria = Categoria.ID
+		join Punti_Segnati on Punti_Segnati.Evento_ID = Evento.ID
+		--join Iscrive on Evento.ID = Iscrive.ID
+		join Utente on Punti_Segnati.Username = Utente.Username
+		--join Candidatura on candidatura.Username = Utente.Username
+	--Where Iscrive.stato = 'confermato'
 	Group by (Impianto, Mese, nomeC, durata)
 
 /*************************************************************************************************************************************************************************/ 
@@ -487,11 +500,12 @@ LANGUAGE plpgsql;
 
 /*************************************************************************************************************************************************************************/ 
 /* 4b1: funzione che dato un giocatore ne calcoli il livello */
+
 /*
-	calcolo la media delle valutazioni la peso in centesimi e ottengo il mio livello
-	se ho perso l'ultima partita al mio livello in centesimo sottagraggo 3
-	se ho il flag affidabile a false la mia valutazione sarà inferiore di 5
-*/
+calcolo la media delle valutazioni la peso in centesimi e ottengo il mio livello
+se ho perso l'ultima partita al mio livello in centesimo sottagraggo 3
+se ho il flag affidabile a false la mia valutazione sarà inferiore di 5*/
+
 ------------------------------------------------------------------------------
 -- Funzione che trova la squadra vincente dell'ultimo evento a cui l'utente ha partecipato
 
@@ -528,7 +542,6 @@ $$
 LANGUAGE plpgsql;
 
 -------------------------------------------------------------------------
-
 CREATE FUNCTION user_category_level(Pers varchar, Cat decimal)
 RETURNS DECIMAL
 AS $$
@@ -557,9 +570,9 @@ BEGIN
 		vincente = false;
 	END IF;
 	
-	Select * --count(*) --into num_valutaz
+	Select count(*) into num_valutaz
 	from Prestazione join Evento on Evento_ID = ID
-	Where Valutato = 'user456' --AND Categoria =  1;
+	Where Valutato = Pers AND Categoria =  Cat;
 	
 	Select sum(valutazione) into sum_valutaz
 	From Prestazione join Evento on Evento_ID = ID
@@ -581,7 +594,7 @@ BEGIN
 END $$
 LANGUAGE plpgsql;
 
-Select* From user_category_level('user456',1);
+--Select* From user_category_level('user456',1);
 ------------------------------------------------------------------------------
 
 CREATE FUNCTION find_last_match(Pers varchar, Cat decimal)
@@ -597,27 +610,118 @@ LANGUAGE plpgsql;
 
 -----------------------------------------------------------------------------
 
-/* 4b2: funzione corrispondente alla seguente query parametrica: data una categoria e un corso di studi, 
+/* 4b2: funzione corrispondente alla seguente query parametrica: data una categoria e un corso di studi,
 determinare la frazione di partecipanti a 
 eventi di quella categoria di genere femminile sul totale dei partecipanti provenienti da quel corso di studi */
 /*************************************************************************************************************************************************************************/ 
 
 /* inserire qui i comandi SQL per la creazione della funzione lasciando la specifica nel commento precedente corrispondente alla funzione realizzata tra le due alternative proposte per b., a seconda che il livello del giocatore sia memorizzato o meno */ 
 
+CREATE OR REPLACE FUNCTION FrazionePartecipantiFemminili(CategoriaID decimal, CorsoDiStudi varchar)
+RETURNS DECIMAL AS $$
+DECLARE
+    totale_partecipanti DECIMAL;
+    partecipanti_femminili DECIMAL;
+BEGIN
+    -- Calcolare il totale dei partecipanti provenienti dal corso di studi
+    SELECT COUNT(*) INTO totale_partecipanti
+    FROM Candidatura c
+		JOIN Utente u ON c.Username = u.Username
+    	JOIN Partecipa p ON p.Squadra_ID = c.Squadra
+    	JOIN Evento e ON e.ID = p.Evento_ID
+    WHERE e.Categoria = CategoriaID AND u.corso_di_studi = CorsoDiStudi
+		AND c.stato = 'accettato';
+
+    -- Calcolare il numero di partecipanti femminili provenienti dal corso di studi
+    SELECT COUNT(*) INTO partecipanti_femminili
+    FROM Candidatura c
+		JOIN Utente u ON c.Username = u.Username
+    	JOIN Partecipa p ON p.Squadra_ID = c.Squadra
+    	JOIN Evento e ON e.ID = p.Evento_ID
+    WHERE e.Categoria = CategoriaID AND u.corso_di_studi = CorsoDiStudi
+		AND c.stato = 'accettato' AND u.genere='F';
+    -- Se il totale dei partecipanti è zero, restituire zero
+    IF totale_partecipanti = 0 THEN
+        RETURN 0;
+    ELSE
+        -- Calcolare e restituire la frazione di partecipanti femminili
+        RETURN partecipanti_femminili / totale_partecipanti;
+    END IF;
+END;
+$$ 
+LANGUAGE plpgsql;
+
+--Select * from FrazionePartecipantiFemminili(1,'Informatica');
 
 /*************************************************************************************************************************************************************************/ 
 --5. Trigger
 /*************************************************************************************************************************************************************************/ 
 
 /*************************************************************************************************************************************************************************/ 
-/* 5a: trigger per la verifica del vincolo che non è possibile iscriversi a eventi chiusi e che lo stato di un evento sportivo diventa CHIUSO quando si raggiunge un numero di giocatori pari a quello previsto dalla categoria */
+/* 5a: trigger per la verifica del vincolo che non è possibile iscriversi a eventi chiusi 
+e che lo stato di un evento sportivo diventa CHIUSO quando si raggiunge un numero di giocatori pari a quello previsto 
+dalla categoria */
 /*************************************************************************************************************************************************************************/ 
 
 /* inserire qui i comandi SQL per la creazione del trigger senza rimuovere la specifica nel commento precedente */ 
+/* Trigger per impedire l'iscrizione a eventi chiusi*/
+CREATE OR REPLACE FUNCTION check_event_closed()
+RETURNS TRIGGER AS $$
+BEGIN
+    -- Verifica se l'evento è chiuso
+    IF (SELECT stato FROM Evento WHERE ID = NEW.ID_evento) = 'CHIUSO' THEN
+        RAISE EXCEPTION 'Non è possibile iscriversi a un evento chiuso.';
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_check_event_closed
+BEFORE INSERT ON Iscrive
+FOR EACH ROW
+EXECUTE FUNCTION check_event_closed();
+
+/*Trigger per aggiornare lo stato dell'evento a "CHIUSO"*/
+
+CREATE OR REPLACE FUNCTION close_event_if_full()
+RETURNS TRIGGER AS $$
+DECLARE
+    num_giocatori_categoria INT;
+    num_partecipanti INT;
+BEGIN
+    -- il numero di giocatori previsto dalla categoria
+    SELECT num_giocatori INTO num_giocatori_categoria
+    FROM Categoria
+    WHERE ID = (SELECT Categoria FROM Evento WHERE ID = NEW.ID_evento);
+    
+    --il numero di partecipanti attuali all'evento
+    SELECT COUNT(*) INTO num_partecipanti
+    FROM Iscrive
+    WHERE ID_evento = NEW.ID_evento AND stato = 'confermato';
+    
+    -- Se il numero di partecipanti è uguale o superiore al numero di giocatori previsto, chiudo l'evento
+    IF num_partecipanti >= num_giocatori_categoria THEN
+        UPDATE Evento
+        SET stato = 'CHIUSO'
+        WHERE ID = NEW.ID_evento;
+    END IF;
+    
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_close_event_if_full
+AFTER INSERT OR UPDATE ON Iscrive
+FOR EACH ROW
+EXECUTE FUNCTION close_event_if_full();
 
 /*************************************************************************************************************************************************************************/ 
-/* 5b1: trigger che gestisce la sede di un evento: se la sede è disponibile nel periodo di svolgimento dell'evento la sede viene confermata altrimenti viene individuata una sede alternativa: 
-tra gli impianti disponibili nel periodo di svolgimento dell'evento si seleziona quello meno utilizzato nel mese in corso (vedi vista Programma) */
+/* 5b1: trigger che gestisce la sede di un evento: se la sede è disponibile nel periodo 
+di svolgimento dell'evento la sede viene confermata altrimenti viene individuata una sede alternativa: 
+tra gli impianti disponibili nel periodo di svolgimento dell'evento si seleziona 
+quello meno utilizzato nel mese in corso (vedi vista Programma) */
+
+
 
 /* 5b2: trigger per il mantenimento dell'attributo derivato livello */
 /*************************************************************************************************************************************************************************/ 
