@@ -18,8 +18,8 @@ CREATE TABLE Utente(
 	UNIQUE (telefono),
 	UNIQUE (matricola)
 );
-INSERT INTO Utente (Username, premium, corso_di_studi, cognome, nome, telefono, password, matricola, luogoN, dataN)
-VALUES ('user123', true ,'Informatica', 'Rossi', 'Mario', 123456789, 'password123', '123456789', 'Torino', '1990-01-01');
+INSERT INTO Utente (Username, premium, corso_di_studi, cognome, nome, telefono, password, matricola, luogoN, dataN, affidabile)
+VALUES ('user123', true ,'Informatica', 'Rossi', 'Mario', 123456789, 'password123', '123456789', 'Torino', '1990-01-01',true);
 
 INSERT INTO Utente (Username, premium, corso_di_studi, cognome, nome, telefono, password, matricola, luogoN, dataN)
 VALUES ('FQ30', true ,'Matematica statistica', 'Quirolo', 'Federico', 163456789, 'password123', '133756789', 'Genova', '2002-12-30');
@@ -28,8 +28,8 @@ INSERT INTO Utente (Username, premium, corso_di_studi, cognome, nome, telefono, 
 VALUES ('simple2', true ,'Giurisprudenza', 'Francesca', 'Totti', 128456789, 'password123', '103456789', 'Torino', '1999-01-01');
 
 -- 2. Insert with optional fields set to default
-INSERT INTO Utente (Username, corso_di_studi, cognome, nome, telefono, password, matricola, luogoN, dataN)
-VALUES ('user456', 'Informatica', 'Bianchi', 'Anna', 987654321, 'secure_password', '987654321', 'Milano', '1995-07-14');
+INSERT INTO Utente (Username, corso_di_studi, cognome, nome, telefono, password, matricola, luogoN, dataN, affidabile)
+VALUES ('user456', 'Informatica', 'Bianchi', 'Anna', 987654321, 'secure_password', '987654321', 'Milano', '1995-07-14', true);
 
 -- 3. Insert with boolean field set to true
 INSERT INTO Utente (Username, premium, corso_di_studi, cognome, nome, telefono, password, matricola, luogoN, dataN)
@@ -152,6 +152,8 @@ CREATE TABLE Note (
 );
 
 ------------------------------------------------------------------------------------------
+-- Nella tabella l'utente organizzatore di un Evetno 'spot' inserirà le tuple anche per le squadre
+
 CREATE TABLE Candidatura(
 	Username varchar (25) not null REFERENCES Utente (Username),
 	Squadra decimal (5,0) not null REFERENCES Squadra (ID),
@@ -161,11 +163,9 @@ CREATE TABLE Candidatura(
 );
 
 INSERT INTO Candidatura VALUES('user123', 1,'accettato');
-INSERT INTO Candidatura VALUES('user123', 2,'accettato');
 INSERT INTO Candidatura VALUES('user123', 3,'accettato');
 INSERT INTO Candidatura VALUES('user123', 4,'accettato');
-INSERT INTO Candidatura VALUES('user456', 1);
-INSERT INTO Candidatura VALUES('user456', 2);
+INSERT INTO Candidatura VALUES('user456', 2,'accettato');
 INSERT INTO Candidatura VALUES('user456', 3);
 INSERT INTO Candidatura VALUES('user456', 4,'accettato');
 INSERT INTO Candidatura VALUES('user789', 2,'accettato');
@@ -260,7 +260,7 @@ INSERT INTO Impianto VALUES('pallavolo Puggia','valletta puggia',998866523,'pall
 
 ------------------------------------------------------------------------------------------------------
 
-CREATE TABLE Evento(
+CREATE TABLE Evento (
 	ID decimal (5,0) PRIMARY KEY,
 	data date not null,
 	data_disiscrizione date not null check(data_disiscrizione < data),
@@ -273,11 +273,11 @@ CREATE TABLE Evento(
 );
 INSERT INTO Evento VALUES (0, '20/06/2000', '20/06/1999', 'false' , 1, null, 'basket Puggia', 'user123');
 
-INSERT INTO Evento VALUES (1, current_date, '20/06/2024', 'false' , 1, null, 'basket Puggia', 'user123');
-INSERT INTO Evento VALUES (2, current_date, '21/06/2024', 'TRUE' , 3, 'Roland garros', 'tennis Puggia', 'user123');
-INSERT INTO Evento VALUES (3, current_date, '22/06/2024', 'false' , 2, 'FIVB', 'pallavolo Puggia', 'user789');
-INSERT INTO Evento VALUES (4, current_date, '22/06/2024', 'false' , 4, 'Mondiale', 'calcio Gambaro', 'user789');
-INSERT INTO Evento VALUES (5, current_date, '22/06/2024', 'false' , 1, 'NBA', 'basket Puggia', 'user789');
+INSERT INTO Evento VALUES (1, '22/06/2024', '20/06/2024', 'false' , 1, null, 'basket Puggia', 'user123');
+INSERT INTO Evento VALUES (2, '22/06/2024', '21/06/2024', 'TRUE' , 3, 'Roland garros', 'tennis Puggia', 'user123');
+INSERT INTO Evento VALUES (3, '23/06/2024', '22/06/2024', 'false' , 2, 'FIVB', 'pallavolo Puggia', 'user789');
+INSERT INTO Evento VALUES (4, '24/06/2024', '22/06/2024', 'false' , 4, 'Mondiale', 'calcio Gambaro', 'user789');
+INSERT INTO Evento VALUES (5, '30/06/2024', '22/06/2024', 'false' , 1, 'NBA', 'basket Puggia', 'user789');
 INSERT INTO Evento VALUES (6, '29/06/2024', '22/06/2024', 'false' , 1, 'NBA', 'basket Puggia', 'user789');
 ---------------------------------------------------------------------------------------------------
 
@@ -297,8 +297,8 @@ CREATE TABLE Prestazione(
 -- INSERT INTO Prestazione VALUES();
 INSERT INTO Prestazione VALUES('user123',1,'user456', 7);
 INSERT INTO Prestazione VALUES('user123',1,'user789', 8);
-INSERT INTO Prestazione VALUES('user456',2,'user123', 6);
-INSERT INTO Prestazione VALUES('user456',2,'user789', 5);
+INSERT INTO Prestazione VALUES('user456',5,'user123', 8);
+INSERT INTO Prestazione VALUES('user456',5,'user789', 7);
 INSERT INTO Prestazione VALUES('user789',2,'user123', 6);
 INSERT INTO Prestazione VALUES('user789',2,'user456', 7);
 INSERT INTO Prestazione VALUES('user789',1,'user456', 7);
@@ -376,8 +376,8 @@ CREATE TABLE Partecipa (
 	PRIMARY KEY(Squadra_ID, Evento_ID)
 );
 
-INSERT INTO Partecipa VALUES (1,5);
-INSERT INTO Partecipa VALUES (2,5);
+INSERT INTO Partecipa VALUES (1,5,1);
+INSERT INTO Partecipa VALUES (2,5,2);
 INSERT INTO Partecipa VALUES (3,2);
 INSERT INTO Partecipa VALUES (7,6);
 
@@ -492,10 +492,43 @@ LANGUAGE plpgsql;
 	se ho perso l'ultima partita al mio livello in centesimo sottagraggo 3
 	se ho il flag affidabile a false la mia valutazione sarà inferiore di 5
 */
-/*
-	Per i risultati potremmo creare una view?
-*/
-/*
+------------------------------------------------------------------------------
+-- Funzione che trova la squadra vincente dell'ultimo evento a cui l'utente ha partecipato
+
+CREATE OR REPLACE FUNCTION CalcolaEsitoUltimoEvento(Persona varchar)
+RETURNS TABLE(
+    Squadra_Vincente_ID DECIMAL(5,0),
+    Punti_Vincente DECIMAL(3,0)
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT 
+        vincente.Squadra_ID AS Squadra_Vincente_ID,
+        vincente.punti_segnati AS Punti_Vincente
+    FROM
+        (SELECT p.Squadra_ID, p.punti_segnati
+         FROM Partecipa p
+         	JOIN Evento e ON p.Evento_ID = e.ID
+		 	JOIN Candidatura ca ON ca.Username = Persona
+		 	JOIN Categoria c ON c.ID = e.Categoria
+         WHERE e.data = (SELECT MAX(e2.data) FROM Evento e2)
+		 	AND ca.stato = 'accettato'
+		 ORDER BY
+		 	CASE
+        		WHEN c.nomeC = 'minigolf' THEN p.punti_segnati 
+        		ELSE NULL 
+    		END ASC,
+    		CASE
+        		WHEN c.nomeC <> 'minigolf' THEN p.punti_segnati 
+        		ELSE NULL 
+    		END DESC
+		  LIMIT 1 ) as vincente;
+END;
+$$ 
+LANGUAGE plpgsql;
+
+-------------------------------------------------------------------------
+
 CREATE FUNCTION user_category_level(Pers varchar, Cat decimal)
 RETURNS DECIMAL
 AS $$
@@ -503,84 +536,66 @@ Declare
 	num_valutaz decimal;
 	sum_valutaz decimal;
 	affidabile boolean;
+	vincente boolean;
+	team decimal;
 BEGIN
 	--check se l'utente non è affidabile
 	Select Utente.affidabile into affidabile
 	From Utente
 	Where Username = Pers;
-	
+		 
 	--check se l'utente ha perso l'utima partita
-	(SELECT p.Squadra_ID, p.punti_segnati
-             FROM Partecipa p
-             	JOIN Evento e ON p.Evento_ID = e.ID
-             WHERE e.data = (SELECT MAX(data) FROM Evento)
-             ORDER BY p.punti_segnati DESC
-             LIMIT 1) as vincente;
-    (SELECT p.Squadra_ID, p.punti_segnati
-             FROM Partecipa p
-             	JOIN Evento e ON p.Evento_ID = e.ID
-             WHERE e.data = (SELECT MAX(data) FROM Evento)
-             ORDER BY p.punti_segnati ASC
-             LIMIT 1) as perdente;
+	Select Squadra_Vincente_ID into team
+	From CalcolaEsitoUltimoEvento(Pers);
 	
-	group by Squadra_ID, punti_segnati
-	Having Max(data)
+	IF Pers IN (Select Username
+				From Candidatura
+				Where Squadra = team AND stato = 'accettato')
+	THEN
+		vincente = true;
+	ELSE
+		vincente = false;
+	END IF;
 	
-	Select count(*) into num_valutaz
+	Select * --count(*) --into num_valutaz
 	from Prestazione join Evento on Evento_ID = ID
-	Where Valutato = Pers AND Categoria =  Cat;
+	Where Valutato = 'user456' --AND Categoria =  1;
 	
 	Select sum(valutazione) into sum_valutaz
 	From Prestazione join Evento on Evento_ID = ID
 	Where Valutato = Pers AND Categoria = Cat;
 	
-	IF num_valutaz = 0
-	THEN
-		Return 60;
+	IF num_valutaz = 0 THEN
+		RETURN 60;
 	ELSE
-		IF affidabile = false
-		THEN
-			RETURN ((sum_valutaz/num_valutaz)*10)-3;
+		IF affidabile = false AND vincente = false THEN
+			RETURN ((sum_valutaz / num_valutaz) * 10) - 5 - 3;
+		ELSIF affidabile = false AND vincente = true THEN
+			RETURN ((sum_valutaz / num_valutaz) * 10) - 5;
+		ELSIF affidabile = true AND vincente = false THEN
+			RETURN ((sum_valutaz / num_valutaz) * 10) - 3;
 		ELSE
-			RETURN (sum_valutaz/num_valutaz)*10;
+			RETURN (sum_valutaz / num_valutaz) * 10;
 		END IF;
 	END IF;
 END $$
-LANGUAGE plpgsql;*/
-
---
-
-CREATE OR REPLACE FUNCTION CalcolaEsitoUltimoEvento(Persona varchar)
-RETURNS TABLE (
-    Squadra_Vincente_ID DECIMAL(5,0),
-    Squadra_Perdente_ID DECIMAL(5,0),
-    Punti_Vincente DECIMAL(3,0),
-    Punti_Perdente DECIMAL(3,0)
-) AS $$
-BEGIN
-    RETURN QUERY
-    SELECT 
-        vincente.Squadra_ID AS Squadra_Vincente_ID,
-        perdente.Squadra_ID AS Squadra_Perdente_ID,
-        vincente.punti_segnati AS Punti_Vincente,
-        perdente.punti_segnati AS Punti_Perdente
-    FROM 
-        (SELECT p.Squadra_ID, p.punti_segnati
-         FROM Partecipa p
-         	JOIN Evento e ON p.Evento_ID = e.ID
-		 	JOIN Candidatura ON Username = Persona
-         WHERE e.data = (SELECT MAX(data) FROM Evento)
-         ORDER BY p.punti_segnati DESC
-         LIMIT 1) AS vincente,
-        (SELECT p.Squadra_ID, p.punti_segnati
-         FROM Partecipa p
-         JOIN Evento e ON p.Evento_ID = e.ID
-         WHERE e.data = (SELECT MAX(data) FROM Evento)
-         ORDER BY p.punti_segnati ASC
-         LIMIT 1) AS perdente;
-END;
-$$ 
 LANGUAGE plpgsql;
+
+Select* From user_category_level('user456',1);
+------------------------------------------------------------------------------
+
+CREATE FUNCTION find_last_match(Pers varchar, Cat decimal)
+RETURNS DECIMAL
+AS$$
+DECLARE
+	last_event decimal;
+BEGIN
+	Select Evento.ID INTO last_event
+	From Utente join 
+END $$
+LANGUAGE plpgsql;
+
+------------------------------------------------------------------------------
 
 Select* From CalcolaEsitoUltimoEvento('user123');
 
