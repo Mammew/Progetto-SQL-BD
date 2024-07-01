@@ -1,0 +1,15 @@
+- tabella candidatura:
+	la candidatura sarà rifiutata automaticamente se il numero di candidati 
+	confermati è = al max num giocatori della Squadra. (trigger)
+
+- Iscrive
+	- L'iscrizione verrà rifiutata se il num di giocatori 'accettati' è = al numero 
+	imposto dalla categoria.
+	- Ci si può iscrivere solo ad Eventi non facenti parte di tornei (trigger)
+
+- Squadra
+	-Le Squadre iscritte ad un Torneo possono Partecipare solo ad Eventi del Torneo (trigger)
+
+- Punti_segnati
+	- Dopo ogni evento verranno inseriti i punti degli Utenti aventi preso parte all'Evento
+	
