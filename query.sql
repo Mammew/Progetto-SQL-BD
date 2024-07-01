@@ -76,7 +76,7 @@ Select Username
 from (Select distinct Utente.Username, Categoria
 		from Utente natural join Iscrive join Evento on Iscrive.ID = Evento.ID 
 	  		join Candidatura on Candidatura.Username = Utente.Username 
-		where Iscrive.stato = 'confermato' OR Candidatura.stato = 'accettato' AND Evento.data <= current_date)
+		where (Iscrive.stato = 'confermato' OR Candidatura.stato = 'accettato' )AND Evento.data <= current_date)
 group by Username
 HAVING count (distinct Categoria) = (Select count (*) from Categoria);
 
