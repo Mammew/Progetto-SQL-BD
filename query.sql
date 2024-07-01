@@ -31,7 +31,9 @@ CREATE VIEW Programma(Impianto, Mese,Numero_Torneo, Numero_Eventi, Categoria, Nu
 		join Utente on Punti_Segnati.Username = Utente.Username
 		--join Candidatura on candidatura.Username = Utente.Username
 	--Where Iscrive.stato = 'confermato'
-	Group by (Impianto, Mese, nomeC, durata)
+	Group by (Impianto, Mese, nomeC, durata);
+
+--Select * from Programma;
 
 /*************************************************************************************************************************************************************************/ 
 --3. Interrogazioni
@@ -40,15 +42,27 @@ CREATE VIEW Programma(Impianto, Mese,Numero_Torneo, Numero_Eventi, Categoria, Nu
 /*************************************************************************************************************************************************************************/ 
 /* 3a: Determinare gli utenti che si sono candidati come giocatori e non sono mai stati accettati e quelli che sono stati accettati tutte le volte che si sono candidati */
 /*************************************************************************************************************************************************************************/ 
-
-Select Username
-from Utente natural join Iscrive
-where stato = 'confermato'
-EXCEPT
-Select Username
-from Utente natural join Iscrive
-where stato = 'rifiutato'
-
+-- La query è stata interpretata come candidatura alle Squadre in quanto se un Utente viene accettato allora seguirà la sua candidatura
+-- ad una squadra. Tale Squadra sarà creata nella quale vi saranno, naturlamente, tutti gli Utenti confermati per l'Evento
+(
+	Select Username User
+	from Utente natural join Candidatura
+	where stato = 'accettato'
+	EXCEPT
+	Select Username User
+	from Utente natural join Candidatura
+	where stato = 'rifiutato'
+)
+UNION
+(
+	Select u1.Username User
+	from Utente u1 natural join Candidatura c1 join Iscrive i1 on i1.Username = u1.Username
+	where c1.stato = 'rifiutato' OR i1.stato = 'rifiutato'
+	EXCEPT
+	Select u2.Username User
+	from Utente u2 natural join Candidatura c2 join Iscrive i2 on i2.Username = u2.Username
+	where c2.stato = 'accettato' OR i2.stato = 'accettato'
+)
 /* inserire qui i comandi SQL per la creazione della query senza rimuovere la specifica nel commento precedente */ 
 
 /*************************************************************************************************************************************************************************/ 
