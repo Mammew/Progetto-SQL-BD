@@ -13,27 +13,27 @@ complessiva (minuti totali nel mese in cui l impianto utilizzabile) */
 
 /* inserire qui i comandi SQL per la creazione della vista senza rimuovere la specifica nel commento precedente */ 
 
-CREATE VIEW Programma(Impianto, Mese,Numero_Torneo, Numero_Eventi, Categoria, Numero_Giocatori, 
+CREATE OR REPLACE VIEW Programma(Impianto, Mese,Numero_Torneo, Numero_Eventi, Categoria, Numero_Giocatori, 
 					  Numero_corso_di_studi, Minuti_Tot, Percentuale_utilizzo)AS
 	Select Impianto, 
 			EXTRACT(MONTH FROM Evento.data) Mese,
 			count(distinct NomeT) Num_Tornei,
 			count(distinct Evento.ID) Num_Eventi, nomeC, 
-			count(distinct Punti_Segnati.Username) Num_Giocatori, 
+			count(distinct Iscrive.Username) Num_Giocatori, 
 			count (distinct corso_di_studi) Num_corso_di_studi, 
 			sum(durata) Minuti_Tot, 
 			(sum(durata)/18000*100) Percentuale_utilizzo
 	From Torneo
 		join Evento on torneo=NomeT 
 		join Categoria on Categoria = Categoria.ID
-		join Punti_Segnati on Punti_Segnati.Evento_ID = Evento.ID
-		--join Iscrive on Evento.ID = Iscrive.ID
-		join Utente on Punti_Segnati.Username = Utente.Username
+		--join Punti_Segnati on Punti_Segnati.Evento_ID = Evento.ID
+		join Iscrive on Evento.ID = Iscrive.ID
+		join Utente on Iscrive.Username = Utente.Username
 		--join Candidatura on candidatura.Username = Utente.Username
-	--Where Iscrive.stato = 'confermato'
-	Group by (Impianto, Mese, nomeC, durata);
+	Where Iscrive.stato = 'confermato'
+	Group by (Impianto, Mese, nomeC);
 
---Select * from Programma;
+Select * from Programma;
 
 /*************************************************************************************************************************************************************************/ 
 --3. Interrogazioni
@@ -232,18 +232,6 @@ END $$
 LANGUAGE plpgsql;
 
 --Select* From user_category_level('user456',1);
-------------------------------------------------------------------------------
-
-CREATE OR REPLACE FUNCTION find_last_match(Pers varchar, Cat decimal)
-RETURNS DECIMAL
-AS $$
-DECLARE
-	last_event decimal;
-BEGIN
-	Select Evento.ID INTO last_event
-	From Utente join 
-END $$;
-LANGUAGE plpgsql;
 
 -----------------------------------------------------------------------------
 
@@ -358,8 +346,68 @@ EXECUTE FUNCTION close_event_if_full();
 di svolgimento dell'evento la sede viene confermata altrimenti viene individuata una sede alternativa: 
 tra gli impianti disponibili nel periodo di svolgimento dell'evento si seleziona 
 quello meno utilizzato nel mese in corso (vedi vista Programma) */
+-- Creazione della funzione del trigger
 
+CREATE OR REPLACE FUNCTION gestione_sede_evento() 
+RETURNS TRIGGER AS $$
+DECLARE
+    volte_sede_non_disponibile BOOLEAN;
+    sede_alternativa RECORD;
+BEGIN
+    -- Verifica se la sede è disponibile nel periodo dell'evento 
+    SELECT COUNT(*) INTO volte_sede_non_disponibile
+    FROM Evento join Categoria on Evento.categoria = categoria.id
+    WHERE Impianto = NEW.Impianto
+	 AND (
+        (NEW.data >= Evento.data 
+		 AND 
+		 DATEADD(minute, Categoria.durata , new.data) < DATEADD(minute, Categoria.durata , Evento.data) ) 
+		 OR
+		 (new.data < Evento.data 
+		  AND 
+		  DATEADD(minute, Categoria.durata , new.data) < DATEADD(minute, Categoria.durata , Evento.data)
+		 )
+		 OR
+        (Evento.data < new.data 
+		 AND 
+		 DATEADD(minute, categoria.durata , Evento.data) < DATEADD(minute, Categoria.durata , new.data) 
+		) 
+		 OR
+		 (new.data < Evento.data 
+		 AND
+		 DATEADD(minute, Categoria.durata , Evento.data) < DATEADD(minute, Categoria.durata , new.data)
+		 )
+	 	) ;
+		  
+    IF volte_sede_non_disponibile = 0 THEN
+        -- Se la sede è disponibile, conferma la sede
+        RETURN NEW;
+    ELSE
+        -- Se la sede non è disponibile, seleziona una sede alternativa
+        SELECT Impianto --INTO sede_alternativa
+        FROM Programma
+        WHERE Mese = EXTRACT(MONTH FROM NEW.data)
+        ORDER BY Percentuale_utilizzo ASC
+        LIMIT 1;
 
+        -- Assegna la sede alternativa
+        IF sede_alternativa IS NOT NULL THEN
+            NEW.Impianto = sede_alternativa.Impianto;
+        ELSE
+            RAISE EXCEPTION 'Nessuna sede disponibile per il periodo specificato.';
+        END IF;
+        RETURN NEW;
+    END IF;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Applicazione del trigger alla tabella Evento
+CREATE TRIGGER trigger_gestione_sede_evento
+BEFORE INSERT OR UPDATE ON Evento
+FOR EACH ROW
+EXECUTE FUNCTION gestione_sede_evento();
+
+INSERT INTO Evento VALUES (50, '22/06/2024', '20/06/2024', 'false' , 1, null, 'basket Puggia', 'user123');
 
 /* 5b2: trigger per il mantenimento dell'attributo derivato livello */
 /*************************************************************************************************************************************************************************/ 
