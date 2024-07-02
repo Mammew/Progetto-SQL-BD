@@ -3,7 +3,7 @@ set search_path to 'UniGeSocialSport_p';
 set datestyle to "DMY";
 
 CREATE TABLE Utente(
-	Username varchar (25) PRIMARY KEY,
+	Username varchar (25) not null PRIMARY KEY,
 	premium boolean not null DEFAULT false,
 	genere varchar not null check(genere in ('M','F')),
 	corso_di_studi varchar (30) NOT NULL,
@@ -23,7 +23,7 @@ CREATE TABLE Utente(
 ----------------------------------------------------------------------
 
 CREATE TABLE Categoria(
-	ID decimal (5,0) PRIMARY KEY,
+	ID decimal (5,0) not null PRIMARY KEY,
 	nomeC varchar (20) not null,
 	num_giocatori decimal (2,0) NOT NULL,
 	durata decimal (3,0) not null,
@@ -61,7 +61,7 @@ LANGUAGE plpgsql;
 
 
 CREATE TABLE Torneo (
-	NomeT varchar (30) PRIMARY KEY,
+	NomeT varchar (30) not null PRIMARY KEY,
 	data_limite date not null, --check( data_limite > current_date),
 	Organizzatore varchar(25) not null REFERENCES Utente(Username) CHECK (is_organizzatore_premium(Organizzatore)), 
 	descrizione varchar (100)
@@ -71,10 +71,10 @@ CREATE TABLE Torneo (
 -------------------------------------------------------------------------
 
 CREATE TABLE Squadra(
-	ID decimal (5,0) PRIMARY KEY,
+	ID decimal (5,0) not null PRIMARY KEY,
 	NomeS varchar(25) not null,
 	Torneo varchar(30) not null REFERENCES Torneo (NomeT), -- forse serve il not null
-	Organizzatore varchar (25) REFERENCES Utente(Username) CHECK (is_organizzatore_premium(Organizzatore)),
+	Organizzatore varchar (25) not null REFERENCES Utente(Username) CHECK (is_organizzatore_premium(Organizzatore)),
 	num_giocatori_max decimal (2,0) not null,
 	num_giocatori_min decimal (2,0) not null,
 	colore_maglia varchar (15),
@@ -86,7 +86,7 @@ CREATE TABLE Squadra(
 -------------------------------------------------------------------------------
 
 CREATE TABLE Note (
-	ID decimal (5,0) PRIMARY KEY,
+	ID decimal (5,0) not null PRIMARY KEY,
 	Squadra_ID decimal (5,0) not null REFERENCES Squadra(ID),
 	nota varchar (100) not null
 );
@@ -106,14 +106,14 @@ CREATE TABLE Candidatura(
 ---------------------------------------------------------------------------------
 
 CREATE TABLE Restrizioni(
-	ID decimal (2,0) PRIMARY KEY,
+	ID decimal (2,0) not null PRIMARY KEY,
 	descrizione varchar(100) not null
 );
 
 
 CREATE TABLE RestrizioniTorneo(
-	ID decimal(2,0) REFERENCES Restrizioni (ID),
-	NomeT varchar (25) REFERENCES Torneo(NomeT),
+	ID decimal(2,0) not null REFERENCES Restrizioni (ID),
+	NomeT varchar (30) not null REFERENCES Torneo(NomeT),
 	PRIMARY KEY (ID,NomeT)
 );
 
@@ -122,14 +122,14 @@ CREATE TABLE RestrizioniTorneo(
 ---------------------------------------------------------------------
 
 CREATE TABLE Premio (
-	ID decimal(2,0) PRIMARY KEY,
-	premio varchar(100) not null
+	ID decimal(2,0) not null PRIMARY KEY,
+	premio varchar(100) not null not null
 );
 
 
 CREATE TABLE PremioTorneo(
-	ID decimal(2,0) REFERENCES Premio (ID),
-	NomeT varchar (25) REFERENCES Torneo(NomeT),
+	ID decimal(2,0) not null REFERENCES Premio (ID),
+	NomeT varchar (30) not null REFERENCES Torneo(NomeT),
 	PRIMARY KEY (ID,NomeT)
 );
 
@@ -138,22 +138,22 @@ CREATE TABLE PremioTorneo(
 ---------------------------------------------------------------------
 
 CREATE TABLE Sponsor(
-	ID decimal(2,0) PRIMARY KEY,
+	ID decimal(2,0) not null PRIMARY KEY,
 	nome varchar(40) not null
 );
 
 
 CREATE TABLE SponsorTorneo (
-	ID decimal(2,0) REFERENCES Sponsor (ID),
-	NomeT varchar (25) REFERENCES Torneo(NomeT),
+	ID decimal(2,0) not null REFERENCES Sponsor (ID),
+	NomeT varchar (30) not null REFERENCES Torneo(NomeT),
 	PRIMARY KEY (ID,NomeT)
 );
 
 
 ----------------------------------------------------------
 
-CREATE TABLE Impianto(
-	NomeI varchar(20) PRIMARY KEY,
+CREATE TABLE Impianto (
+	NomeI varchar(20) not null PRIMARY KEY,
 	via varchar(20) not null,
 	telefono decimal (9,0) not null,
 	email varchar (30) not null,
@@ -167,7 +167,7 @@ CREATE TABLE Impianto(
 ------------------------------------------------------------------------------------------------------
 
 CREATE TABLE Evento (
-	ID decimal (5,0) PRIMARY KEY,
+	ID decimal (5,0) not null PRIMARY KEY,
 	data date not null,
 	data_disiscrizione date not null check(data_disiscrizione < data),
 	foto boolean not null DEFAULT false,
@@ -181,9 +181,9 @@ CREATE TABLE Evento (
 ----------------------------------------------------------------------------------------
 
 CREATE TABLE Prestazione(
-	Valutato varchar (25) REFERENCES Utente (Username),
-	Evento_ID decimal (5,0) REFERENCES Evento (ID),
-	Valutante varchar (25) REFERENCES Utente (Username),
+	Valutato varchar (25) not null REFERENCES Utente (Username),
+	Evento_ID decimal (5,0) not null REFERENCES Evento (ID),
+	Valutante varchar (25) not null REFERENCES Utente (Username),
 	valutazione decimal (3,0) not null,
 	commento varchar(100),
 	PRIMARY KEY (Valutato, Evento_ID, Valutante)
@@ -197,8 +197,8 @@ CREATE TABLE Prestazione(
 ---------------------------------------------------------------------------------------------------
 
 CREATE TABLE Punti_Segnati(
-	Username varchar (25) REFERENCES Utente(Username),
-	Evento_ID decimal (5,0) REFERENCES Evento(ID),
+	Username varchar (25) not null REFERENCES Utente(Username),
+	Evento_ID decimal (5,0) not null REFERENCES Evento(ID),
 	punti_Goal decimal(3,0) not null,
 	PRIMARY KEY (Username, Evento_ID)
 );
@@ -244,8 +244,8 @@ CREATE TABLE Iscrive(
 -- Trigger che impone che solo squadre con nomi differenti possono iscriversi allo stesso evento
 
 CREATE TABLE Partecipa (
-	Squadra_ID decimal (5,0) REFERENCES Squadra(ID),
-	Evento_ID decimal (5,0) REFERENCES Evento (ID),
+	Squadra_ID decimal (5,0) not null REFERENCES Squadra(ID),
+	Evento_ID decimal (5,0) not null REFERENCES Evento (ID),
 	punti_segnati decimal(3,0),
 	PRIMARY KEY(Squadra_ID, Evento_ID)
 );
