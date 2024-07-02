@@ -1,17 +1,17 @@
-- tabella candidatura:
+- Candidatura:
 	la candidatura sarà rifiutata automaticamente se il numero di candidati 
 	confermati è = al max num giocatori della Squadra. (trigger)
 
 - Iscrive
 	- L'iscrizione verrà rifiutata se il num di giocatori 'accettati' è = al numero 
 	imposto dalla categoria.
-	- Ci si può iscrivere solo ad Eventi non facenti parte di tornei (trigger)
-	- Se si è iscritti a un Torneo di default dopo la data limite ( quindi la squadra avrà il numero minimo di partecipanti)
-		verrà rimepita anceh l'iscrizione per ogni utente facente parte della squadra per tenere traccia dei ritardi e dei noshow
+	- Ci si può iscrivere solo ad Eventi non facenti parte di tornei (trigger).
+	- Se si è 'confermati' in una Squadra inscritta ad un Torneo di default dopo la data limite
+		verrà inserita anche l'iscrizione per ogni utente facente parte della squadra per tenere traccia dei ritardi e dei no_show
 
 - Squadra
 	-Le Squadre iscritte ad un Torneo possono Partecipare solo ad Eventi del Torneo (trigger)
-	-le Squadre che non hanno ancora il numero minimo di partecipanti possono iscriversi a un Torneo
+	-Le Squadre che non hanno ancora il numero minimo di partecipanti possono iscriversi a un Torneo
 	-Tali squadre se entro la data limite non hanno raggiunto il numero minimo di giocatori saranno disiscritte
 
 - Punti_segnati

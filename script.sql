@@ -15,7 +15,7 @@ CREATE TABLE Utente(
 	affidabile boolean not null default true,
 	matricola varchar (9) not null,
 	luogoN varchar(25) not null,
-	dataN date not null,
+	dataN date not null check(dataN < current_date),
 	UNIQUE (telefono),
 	UNIQUE (matricola)
 );
@@ -76,7 +76,7 @@ CREATE TABLE Squadra(
 	Torneo varchar(30) not null REFERENCES Torneo (NomeT), -- forse serve il not null
 	Organizzatore varchar (25) not null REFERENCES Utente(Username) CHECK (is_organizzatore_premium(Organizzatore)),
 	num_giocatori_max decimal (2,0) not null,
-	num_giocatori_min decimal (2,0) not null,
+	num_giocatori_min decimal (2,0) not null check (num_giocatori_min < num_giocatori_max),
 	colore_maglia varchar (15),
 	stato varchar(6) not null default 'aperto' check (stato in ('aperto','chiuso')),
 	descrizione varchar (100),
@@ -665,7 +665,7 @@ INSERT INTO Punti_segnati VALUES ('user006',4,1);
 INSERT INTO Punti_segnati VALUES ('user007',4,1);
 
 
------- iscrivo tutti gli utenti delle squadre
+------ iscrivo tutti gli utenti delle 
 
 --squadra 1 gioca evento 5 Boston NBA
 INSERT INTO Iscrive VALUES ('user123',5,null,'confermato','10/05/2024','giocatore',null,null);
