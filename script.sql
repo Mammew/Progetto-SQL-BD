@@ -741,7 +741,7 @@ INSERT INTO Iscrive VALUES ('user012',6,null,'confermato','10/05/2024','giocator
 
 -- Squadre 3 e 13 Roland Garros evento 2
 INSERT INTO Iscrive VALUES ('user013',2,null,'confermato','25/08/2023','giocatore',null,null);
-INSERT INTO Iscrive VALUES ('user014',2,null,'confermato','25/08/2023','giocatore',null,nul
+INSERT INTO Iscrive VALUES ('user014',2,null,'confermato','25/08/2023','giocatore',null,nul)
 
 
 
