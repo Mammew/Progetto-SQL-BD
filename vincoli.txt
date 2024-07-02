@@ -6,6 +6,8 @@
 	- L'iscrizione verrà rifiutata se il num di giocatori 'accettati' è = al numero 
 	imposto dalla categoria.
 	- Ci si può iscrivere solo ad Eventi non facenti parte di tornei (trigger)
+	- Se si è iscritti a un Torneo di default dopo la data limite ( quindi la squadra avrà il numero minimo di partecipanti)
+		verrà rimepita anceh l'iscrizione per ogni utente facente parte della squadra per tenere traccia dei ritardi e dei noshow
 
 - Squadra
 	-Le Squadre iscritte ad un Torneo possono Partecipare solo ad Eventi del Torneo (trigger)
@@ -14,5 +16,11 @@
 
 - Punti_segnati
 	- Dopo ogni evento verranno inseriti i punti degli Utenti aventi preso parte all'Evento
+
+-Evento
+	- Un utente iscritto a un Evento che non ha un squadra contro cui battersi implica che l'evento sarà annullato
+	-Analogomente se un Torneo non ha almeno 2 squadre implica l'eliminazione di quest'ultimo
+- 
+
 
 	

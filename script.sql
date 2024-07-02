@@ -12,7 +12,7 @@ CREATE TABLE Utente(
 	foto boolean not null default false,
 	telefono decimal (9,0) not null,
 	password varchar (20) not null,
-	affidabile boolean,
+	affidabile boolean not null default true,
 	matricola varchar (9) not null,
 	luogoN varchar(25) not null,
 	dataN date not null,
@@ -62,7 +62,7 @@ LANGUAGE plpgsql;
 
 CREATE TABLE Torneo (
 	NomeT varchar (30) PRIMARY KEY,
-	data_limite date not null check( data_limite > current_date),
+	data_limite date not null, --check( data_limite > current_date),
 	Organizzatore varchar(25) not null REFERENCES Utente(Username) CHECK (is_organizzatore_premium(Organizzatore)), 
 	descrizione varchar (100)
 );
@@ -256,7 +256,7 @@ VALUES ('user123', true,'M','Informatica', 'Rossi', 'Mario', 123456789, 'passwor
 
 --FQ30 utente che è sempre stato rifiutato
 INSERT INTO Utente (Username, genere, corso_di_studi, cognome, nome, telefono, password, matricola, luogoN, dataN)
-VALUES ('FQ30','M','Matematica statistica', 'Quirolo', 'Federico', 163456789, 'password123', '133756789', 'Genova', '2002-12-30');
+VALUES ('FQ30','M','Matematica statistica', 'Queirolo', 'Federico', 163456789, 'password123', '133756789', 'Genova', '2002-12-30');
 
 -- simple non ha mai partecipato a un evento non può valutare
 INSERT INTO Utente (Username, premium, genere, corso_di_studi, cognome, nome, telefono, password, matricola, luogoN, dataN)
@@ -275,19 +275,19 @@ VALUES ('user789', true,'M','Giurisprudenza', 'Verdi', 'Giuseppe', 222333444, 'p
 --- tutti dovrebbero avere il campo affidabile perchè l'utente premium vede quel campo su tutti da controllare
 
 INSERT INTO Utente (Username, premium, genere, corso_di_studi, cognome, nome, telefono, password, matricola, luogoN, dataN, affidabile)
-VALUES ('user001', false, 'M', 'Economia', 'Rossi', 'Luigi', 333222111, 'password001', '101010101', 'Napoli', '1992-03-15', false);
+VALUES ('user001', false, 'M', 'Economia', 'Rossi', 'Luigi', 333222111, 'password001', '101010101', 'Napoli', '1992-03-15', true);
 
 INSERT INTO Utente (Username, premium, genere, corso_di_studi, cognome, nome, telefono, password, matricola, luogoN, dataN)
 VALUES ('user002', true, 'M', 'Ingegneria', 'Bianchi', 'Stefano', 444555666, 'password002', '202020202', 'Firenze', '1994-08-21');
 
 INSERT INTO Utente (Username, premium, genere, corso_di_studi, cognome, nome, telefono, password, matricola, luogoN, dataN)
-VALUES ('user003', false, 'M', 'Fisica', 'Verdi', 'Marco', 555666777, 'password003', '303030303', 'Bologna', '1991-11-05');
+VALUES ('user003', false, 'M', 'Fisica', 'Verdi', 'Marco', 555663777, 'password003', '303030303', 'Bologna', '1991-11-05');
 
 INSERT INTO Utente (Username, premium, genere, corso_di_studi, cognome, nome, telefono, password, matricola, luogoN, dataN)
-VALUES ('user004', true, 'M', 'Chimica', 'Gialli', 'Filippo', 666777888, 'password004', '404040404', 'Palermo', '1993-02-19');
+VALUES ('user004', true, 'M', 'Chimica', 'Gialli', 'Filippo', 666747888, 'password004', '404040404', 'Palermo', '1993-02-19');
 
 INSERT INTO Utente (Username, premium, genere, corso_di_studi, cognome, nome, telefono, password, matricola, luogoN, dataN)
-VALUES ('user005', false, 'M', 'Biologia', 'Neri', 'Franco', 777888999, 'password005', '505050505', 'Venezia', '1995-05-30');
+VALUES ('user005', false, 'M', 'Biologia', 'Neri', 'Franco', 977888999, 'password005', '505050505', 'Venezia', '1995-05-30');
 
 --- altri sette utenti maschi
 
@@ -295,57 +295,57 @@ INSERT INTO Utente (Username, premium, genere, corso_di_studi, cognome, nome, te
 VALUES ('user006', true, 'M', 'Matematica', 'Ferrari', 'Andrea', 888999000, 'password006', '606060606', 'Roma', '1990-04-12', true);
 
 INSERT INTO Utente (Username, premium, genere, corso_di_studi, cognome, nome, telefono, password, matricola, luogoN, dataN)
-VALUES ('user007', false, 'M', 'Informatica', 'Rossi', 'Alberto', 999000111, 'password007', '707070707', 'Milano', '1992-07-18');
+VALUES ('user007', false, 'M', 'Informatica', 'Rossi', 'Alberto', 959000111, 'password007', '707070707', 'Milano', '1992-07-18');
 
 INSERT INTO Utente (Username, premium, genere, corso_di_studi, cognome, nome, telefono, password, matricola, luogoN, dataN)
 VALUES ('user008', true, 'M', 'Storia', 'Bianchi', 'Davide', 111222333, 'password008', '808080808', 'Torino', '1994-10-02');
 
 INSERT INTO Utente (Username, premium, genere, corso_di_studi, cognome, nome, telefono, password, matricola, luogoN, dataN)
-VALUES ('user009', false, 'M', 'Filosofia', 'Verdi', 'Giorgio', 222333444, 'password009', '909090909', 'Firenze', '1996-01-25');
+VALUES ('user009', false, 'M', 'Filosofia', 'Verdi', 'Giorgio', 222933444, 'password009', '909090909', 'Firenze', '1996-01-25');
 
 INSERT INTO Utente (Username, premium, genere, corso_di_studi, cognome, nome, telefono, password, matricola, luogoN, dataN)
 VALUES ('user010', true, 'M', 'Lettere', 'Neri', 'Paolo', 333444555, 'password010', '101010110', 'Bologna', '1991-12-15');
 
 INSERT INTO Utente (Username, premium, genere, corso_di_studi, cognome, nome, telefono, password, matricola, luogoN, dataN)
-VALUES ('user011', false, 'M', 'Scienze Politiche', 'Gialli', 'Luca', 444555666, 'password011', '111111111', 'Napoli', '1993-03-05');
+VALUES ('user011', false, 'M', 'Scienze Politiche', 'Gialli', 'Luca', 404555666, 'password011', '111111111', 'Napoli', '1993-03-05');
 
 INSERT INTO Utente (Username, premium, genere, corso_di_studi, cognome, nome, telefono, password, matricola, luogoN, dataN)
-VALUES ('user012', true, 'M', 'Economia', 'Blu', 'Matteo', 555666777, 'password012', '121212121', 'Palermo', '1995-06-23');
+VALUES ('user012', true, 'M', 'Economia', 'Blu', 'Matteo', 855666777, 'password012', '121212821', 'Palermo', '1995-06-23');
 
 --- altri 2 utenti maschi bonus
 INSERT INTO Utente (Username, premium, genere, corso_di_studi, cognome, nome, telefono, password, matricola, luogoN, dataN, affidabile)
 VALUES ('user025', false, 'M', 'Ingegneria Civile', 'Ferrari', 'Luca', 999000111, 'password025', '252525252', 'Firenze', '1993-04-20', true);
 
 INSERT INTO Utente (Username, premium, genere, corso_di_studi, cognome, nome, telefono, password, matricola, luogoN, dataN)
-VALUES ('user026', true, 'M', 'Medicina', 'Moretti', 'Andrea', 111222333, 'password026', '262626262', 'Napoli', '1995-12-12');
+VALUES ('user026', true, 'M', 'Medicina', 'Moretti', 'Andrea', 911222333, 'password026', '262626262', 'Napoli', '1995-12-12');
 
 
 --- 6 utenti donne
 INSERT INTO Utente (Username, premium, genere, corso_di_studi, cognome, nome, telefono, password, matricola, luogoN, dataN, affidabile)
-VALUES ('user013', true, 'F', 'Biologia', 'Marini', 'Chiara', 666777888, 'password013', '131313131', 'Venezia', '1990-05-14', true);
+VALUES ('user013', true, 'F', 'Biologia', 'Marini', 'Chiara', 666777838, 'password013', '131313131', 'Venezia', '1990-05-14', true);
 
 INSERT INTO Utente (Username, premium, genere, corso_di_studi, cognome, nome, telefono, password, matricola, luogoN, dataN)
-VALUES ('user014', false, 'F', 'Chimica', 'Ricci', 'Sofia', 777888999, 'password014', '141414141', 'Genova', '1992-08-22');
+VALUES ('user014', false, 'F', 'Chimica', 'Ricci', 'Sofia', 177888999, 'password014', '141414141', 'Genova', '1992-08-22');
 
 INSERT INTO Utente (Username, premium, genere, corso_di_studi, cognome, nome, telefono, password, matricola, luogoN, dataN)
-VALUES ('user015', true, 'F', 'Fisica', 'Esposito', 'Giulia', 888999000, 'password015', '151515151', 'Roma', '1994-11-09');
+VALUES ('user015', true, 'F', 'Fisica', 'Esposito', 'Giulia', 818999000, 'password015', '151515151', 'Roma', '1994-11-09');
 
 INSERT INTO Utente (Username, premium, genere, corso_di_studi, cognome, nome, telefono, password, matricola, luogoN, dataN)
-VALUES ('user016', false, 'F', 'Medicina', 'Conti', 'Martina', 999000111, 'password016', '161616161', 'Napoli', '1996-02-28');
+VALUES ('user016', false, 'F', 'Medicina', 'Conti', 'Martina', 199000111, 'password016', '161616161', 'Napoli', '1996-02-28');
 
 INSERT INTO Utente (Username, premium, genere, corso_di_studi, cognome, nome, telefono, password, matricola, luogoN, dataN)
-VALUES ('user017', true, 'F', 'Farmacia', 'Moretti', 'Valentina', 111222333, 'password017', '171717171', 'Milano', '1991-09-17');
+VALUES ('user017', true, 'F', 'Farmacia', 'Moretti', 'Valentina', 115222333, 'password017', '171717171', 'Milano', '1991-09-17');
 
 INSERT INTO Utente (Username, premium, genere, corso_di_studi, cognome, nome, telefono, password, matricola, luogoN, dataN)
-VALUES ('user018', false, 'F', 'Ingegneria', 'Barbieri', 'Elena', 222333444, 'password018', '181818181', 'Firenze', '1993-12-21');
+VALUES ('user018', false, 'F', 'Ingegneria', 'Barbieri', 'Elena', 222336444, 'password018', '181818181', 'Firenze', '1993-12-21');
 
 --- 6 utenti donne
 
 INSERT INTO Utente (Username, premium, genere, corso_di_studi, cognome, nome, telefono, password, matricola, luogoN, dataN)
-VALUES ('user019', true, 'F', 'Architettura', 'Greco', 'Federica', 333444555, 'password019', '191919191', 'Bologna', '1995-04-07');
+VALUES ('user019', true, 'F', 'Architettura', 'Greco', 'Federica', 339444555, 'password019', '191919191', 'Bologna', '1995-04-07');
 
 INSERT INTO Utente (Username, premium, genere, corso_di_studi, cognome, nome, telefono, password, matricola, luogoN, dataN, affidabile)
-VALUES ('user020', true, 'F', 'Psicologia', 'Bianchi', 'Laura', 444555666, 'password020', '202020202', 'Pisa', '1990-03-25', true);
+VALUES ('user020', true, 'F', 'Psicologia', 'Bianchi', 'Laura', 434555666, 'password020', '205020202', 'Pisa', '1990-03-25', true);
 
 INSERT INTO Utente (Username, premium, genere, corso_di_studi, cognome, nome, telefono, password, matricola, luogoN, dataN)
 VALUES ('user021', false, 'F', 'Scienze Politiche', 'Rossi', 'Alessia', 555666777, 'password021', '212121212', 'Palermo', '1992-07-15');
@@ -357,7 +357,7 @@ INSERT INTO Utente (Username, premium, genere, corso_di_studi, cognome, nome, te
 VALUES ('user023', false, 'F', 'Lettere', 'Fontana', 'Elisa', 777888999, 'password023', '232323232', 'Ancona', '1996-02-10');
 
 INSERT INTO Utente (Username, premium, genere, corso_di_studi, cognome, nome, telefono, password, matricola, luogoN, dataN)
-VALUES ('user024', true, 'F', 'Giurisprudenza', 'Conti', 'Beatrice', 888999000, 'password024', '242424242', 'Trento', '1998-09-05');
+VALUES ('user024', true, 'F', 'Giurisprudenza', 'Conti', 'Beatrice', 788999000, 'password024', '242424242', 'Trento', '1998-09-05');
 
 
 INSERT INTO Categoria VALUES(1,'Basket' ,10, 42,'si gioca 5 Vs 5 regole del Basket FIBA', false);
@@ -390,20 +390,20 @@ INSERT INTO Liv_Utente VALUES(2, 'user789', 60);
 INSERT INTO Liv_Utente VALUES(3, 'user789', 60);
 INSERT INTO Liv_Utente VALUES(4, 'user789', 60);
 ------
-INSERT INTO Torneo VALUES ('Roland garros', '25/08/2024','user123' ,'Torneo Tennis su terra rossa');
+INSERT INTO Torneo VALUES ('Roland garros', '25/08/2023','user123' ,'Torneo Tennis su terra rossa');
 INSERT INTO Torneo VALUES ('FIVB',' 25/08/2024', 'user789', 'Torneo Pallavolo');
 INSERT INTO Torneo VALUES ('Europeo', '1/08/2024', 'user789', 'Torneo Calcio a 7');
-INSERT INTO Torneo VALUES ('NBA', '10/07/2024', 'user123', 'Torneo Basket indor');
-INSERT INTO Torneo VALUES ('Mondiale', '1/08/2025', 'user789', 'Torneo Calcio a 7');
+INSERT INTO Torneo VALUES ('NBA', '10/05/2024', 'user123', 'Torneo Basket indor');
+INSERT INTO Torneo VALUES ('Mondiale', '1/05/2023', 'user789', 'Torneo Calcio a 7');
 INSERT INTO Torneo VALUES ('FIBA', '1/08/2025', 'user123', 'Torneo Basket indor');
 INSERT INTO Torneo VALUES ('World Volleyball Championship', '02/10/2024', 'user456', 'Campionato mondiale di pallavolo');
 INSERT INTO Torneo VALUES ('Wimbledon', '05/07/2024', 'user123', 'Torneo di tennis su erba');
 INSERT INTO Torneo VALUES ('Champions League', '10/07/2024', 'user789', 'Torneo di calcio europeo');
 INSERT INTO Torneo VALUES ('Euroleague', '15/07/2024', 'user456', 'Torneo di basket europeo');
-INSERT INTO Torneo VALUES ('US Open', '25/07/2024', 'user123', 'Torneo di tennis su cemento');
+INSERT INTO Torneo VALUES ('US Open', '25/07/2025', 'user123', 'Torneo di tennis su cemento');
 INSERT INTO Torneo VALUES ('Serie A', '30/07/2024', 'user456', 'Campionato di calcio italiano');
 INSERT INTO Torneo VALUES ('NBA Finals', '01/08/2024', 'user789', 'Finali del campionato di basket NBA');
-INSERT INTO Torneo VALUES ('Olympics', '05/08/2024', 'user456', 'Giochi olimpici di pallavolo');
+INSERT INTO Torneo VALUES ('Olympics', '05/08/2025', 'user456', 'Giochi olimpici di pallavolo');
 INSERT INTO Torneo VALUES ('French Open', '10/08/2024', 'user123', 'Torneo di tennis su terra battuta');
 ---
 INSERT INTO Squadra VALUES(1, 'Boston', 'NBA', 'user123', 16, 5, 'verde','aperto');
@@ -480,7 +480,7 @@ INSERT INTO Candidatura VALUES('user016', 9,'accettato');
 INSERT INTO Candidatura VALUES('user017', 9,'accettato');
 INSERT INTO Candidatura VALUES('user018', 9,'accettato');
 
--- Squadra 12 gioca agli Olympicds 6 giocatrici
+-- Squadra 12 gioca agli Olympics 6 giocatrici
 INSERT INTO Candidatura VALUES('user019', 12,'accettato');
 INSERT INTO Candidatura VALUES('user020', 12,'accettato');
 INSERT INTO Candidatura VALUES('user021', 12,'accettato');
@@ -518,19 +518,6 @@ INSERT INTO Candidatura VALUES('user009', 2,'accettato');
 INSERT INTO Candidatura VALUES('user010', 2,'accettato');
 INSERT INTO Candidatura VALUES('user011', 2,'accettato');
 INSERT INTO Candidatura VALUES('user012', 2,'accettato');
-
-
-
---- vecchie insert
-/*INSERT INTO Candidatura VALUES('user123', 3,'accettato');
-INSERT INTO Candidatura VALUES('user123', 4,'accettato');
-INSERT INTO Candidatura VALUES('user456', 2,'accettato');
-INSERT INTO Candidatura VALUES('user456', 3);
-INSERT INTO Candidatura VALUES('user456', 4,'rifiutato');
-INSERT INTO Candidatura VALUES('user789', 2,'rifiutato');
-INSERT INTO Candidatura VALUES ('user123', 2, 'accettato');
-INSERT INTO Candidatura VALUES ('user123', 5, 'accettato');
-INSERT INTO Candidatura VALUES ('user789', 4, 'rifiutato');*/
 
 INSERT INTO Restrizioni VALUES (1, 'Torneo solamente per altleti non tesserati');
 INSERT INTO Restrizioni VALUES (2, 'Torneo solamente per femmine ');
@@ -601,15 +588,15 @@ INSERT INTO Evento VALUES (5, '30/06/2024', '22/06/2024', 'false' , 1, 'NBA', 'b
 INSERT INTO Evento VALUES (6, '29/06/2024', '22/06/2024', 'false' , 1, 'NBA', 'basket Puggia', 'user789');
 INSERT INTO Evento VALUES (7, '01/07/2024', '30/06/2024', 'true', 2, 'World Volleyball Championship', 'pallavolo Puggia', 'user456');
 -->INSERT INTO Evento VALUES (8, '05/07/2024', '04/07/2024', 'false', 3, 'Wimbledon', 'tennis Puggia', 'user123');
-INSERT INTO Evento VALUES (9, '10/07/2024', '09/07/2024', 'true', 4, 'Champions League', 'calcio Gambaro', 'user789');
+INSERT INTO Evento VALUES (9, '15/07/2024', '13/07/2024', 'true', 4, 'Champions League', 'calcio Gambaro', 'user789');
 INSERT INTO Evento VALUES (10, '15/07/2024', '14/07/2024', 'false', 1, 'Euroleague', 'basket Puggia', 'user456');
 INSERT INTO Evento VALUES (11, '20/07/2024', '19/07/2024', 'true', 2, 'FIVB', 'pallavolo Puggia', 'user789');
 --> INSERT INTO Evento VALUES (12, '25/07/2024', '24/07/2024', 'false', 3, 'US Open', 'tennis Puggia', 'user123');
 --> INSERT INTO Evento VALUES (13, '30/07/2024', '29/07/2024', 'true', 4, 'Serie A', 'calcio Gambaro', 'user456');
 -->INSERT INTO Evento VALUES (14, '01/08/2024', '31/07/2024', 'false', 1, 'NBA Finals', 'basket Puggia', 'user789');
-INSERT INTO Evento VALUES (15, '05/08/2024', '04/08/2024', 'true', 2, 'Olympics', 'pallavolo Puggia', 'user456');
+INSERT INTO Evento VALUES (15, '10/08/2025', '08/08/2025', 'true', 2, 'Olympics', 'pallavolo Puggia', 'user456');
 INSERT INTO Evento VALUES (16, '10/08/2024', '09/08/2024', 'false', 4, 'Mondiale', 'calcio Gambaro', 'user789');
-INSERT INTO Evento VALUES (17, '22/06/2024', '21/06/2024', 'TRUE' , 3, 'US Open', 'tennis Puggia', 'user123');
+INSERT INTO Evento VALUES (17, '30/07/2025', '28/07/2025', 'TRUE' , 3, 'US Open', 'tennis Puggia', 'user123');
 ------
 --Partecipazione di Boston (Squadra_ID = 1) all evento NBA (Evento_ID = 5)
 INSERT INTO Partecipa VALUES (1, 5, 85);
@@ -647,9 +634,10 @@ INSERT INTO Partecipa VALUES (12, 15, 82);
 -- Partecipazione di FC Barcelona (Squadra_ID = 10) all'evento Champions League (Evento_ID = 9)
 INSERT INTO Partecipa VALUES (10, 9, 4);
 
--- Partecipazione di Real Madrid (Squadra_ID = 11) all'evento Champions League (Evento_ID = 10)
+-- Partecipazione di Real Madrid (Squadra_ID = 11) all'evento Champions League (Evento_ID = 9)
 INSERT INTO Partecipa VALUES (11, 9, 2);
 
+-- eventi per avere l'utente che partecipa a tutte le categore
 INSERT INTO Partecipa VALUES (2, 3, 67); -- Insert della Squadra NonTroppoAtletici (FIVB) all' evento 18 FIVB
 INSERT INTO Partecipa VALUES (4, 17, 3); -- Insert della Squadra SanfuBeach (Europeo) all' evento 17 Europeo
 
@@ -658,25 +646,106 @@ INSERT INTO Partecipa VALUES (4, 17, 3); -- Insert della Squadra SanfuBeach (Eur
 
 ------
 --INSERT INTO Prestazione VALUES();
-INSERT INTO Prestazione VALUES('user123',1,'user456', 7);
-INSERT INTO Prestazione VALUES('user123',1,'user789', 8);
-INSERT INTO Prestazione VALUES('user456',5,'user123', 8);
-INSERT INTO Prestazione VALUES('user456',5,'user789', 7);
-INSERT INTO Prestazione VALUES('user789',2,'user123', 6);
-INSERT INTO Prestazione VALUES('user789',2,'user456', 7);
-INSERT INTO Prestazione VALUES('user789',1,'user456', 7);
-INSERT INTO Prestazione VALUES('user789',1,'user123', 5);
+INSERT INTO Prestazione VALUES('user123',4,'user456', 7);
+INSERT INTO Prestazione VALUES('user123',4,'user789', 8);
+INSERT INTO Prestazione VALUES('user456',4,'user123', 8);
+INSERT INTO Prestazione VALUES('user456',4,'user789', 7);
+INSERT INTO Prestazione VALUES('user789',4,'user123', 6);
+INSERT INTO Prestazione VALUES('user789',4,'user456', 7);
+INSERT INTO Prestazione VALUES('user006',4,'user008', 5);
+INSERT INTO Prestazione VALUES('user009',4,'user123', 6);
+INSERT INTO Prestazione VALUES('user010',4,'user456', 7);
+INSERT INTO Prestazione VALUES('user011',4,'user456', 7);
+INSERT INTO Prestazione VALUES('user012',4,'user123', 5);
 
 --INSERT nella tabella potranno essere effettuate solamente in data posteriore all'Evento a cui si fa riferimento
 -- Implementabile t
-INSERT INTO Punti_segnati VALUES ('user123',5,1);
-INSERT INTO Punti_segnati VALUES ('user456',5,1);
-INSERT INTO Punti_segnati VALUES ('user789',5,1);
---INSERT INTO Punti_segnati VALUES ();
---INSERT INTO Punti_segnati VALUES ();
-------
-INSERT INTO Iscrive VALUES ('user123',0,null,'confermato','12/06/1999','giocatore',null,null);
-INSERT INTO Iscrive VALUES ('user456',0,null,'confermato','10/06/1999','giocatore',null,null);
-INSERT INTO Iscrive VALUES ('user789',0,null,'confermato','28/06/1999','giocatore',null,null);
+INSERT INTO Punti_segnati VALUES ('user123',4,1);
+INSERT INTO Punti_segnati VALUES ('user006',4,1);
+INSERT INTO Punti_segnati VALUES ('user007',4,1);
 
-INSERT INTO Iscrive VALUES ('FQ30',1,null,'confermato',current_date,'giocatore',null,null);
+
+------ iscrivo tutti gli utenti delle squadre
+
+--squadra 1 gioca evento 5 Boston NBA
+INSERT INTO Iscrive VALUES ('user123',5,null,'confermato','10/05/2024','giocatore',null,null);
+INSERT INTO Iscrive VALUES ('user456',5,null,'confermato','10/05/2024','giocatore',null,null);
+INSERT INTO Iscrive VALUES ('user789',5,null,'confermato','10/05/2024','giocatore',null,null);
+INSERT INTO Iscrive VALUES ('user001',5,null,'confermato','10/05/2024','giocatore',null,null);
+INSERT INTO Iscrive VALUES ('user002',5,null,'confermato','10/05/2024','giocatore',null,null);
+INSERT INTO Iscrive VALUES ('user003',5,null,'confermato','10/05/2024','giocatore',null,null);
+INSERT INTO Iscrive VALUES ('user004',5,null,'confermato','10/05/2024','giocatore',null,null);
+
+-- Squadra 7 evento 5 Los Angeles NBA
+INSERT INTO Iscrive VALUES ('user006',5,null,'confermato','10/05/2024','giocatore',null,null);
+INSERT INTO Iscrive VALUES ('user007',5,null,'confermato','10/05/2024','giocatore',null,null);
+INSERT INTO Iscrive VALUES ('user008',5,null,'confermato','10/05/2024','giocatore',null,null);
+INSERT INTO Iscrive VALUES ('user009',5,null,'confermato','10/05/2024','giocatore',null,null);
+INSERT INTO Iscrive VALUES ('user010',5,null,'confermato','10/05/2024','giocatore',null,null);
+INSERT INTO Iscrive VALUES ('user011',5,null,'confermato','10/05/2024','giocatore',null,null);
+INSERT INTO Iscrive VALUES ('user012',5,null,'confermato','10/05/2024','giocatore',null,null);
+
+--squadra 6 gioca evento 4 Sanfubeach Mondiale 
+INSERT INTO Iscrive VALUES ('user123',4,null,'confermato','1/05/2023','giocatore',null,null);
+INSERT INTO Iscrive VALUES ('user456',4,null,'confermato','1/05/2023','giocatore',null,null);
+INSERT INTO Iscrive VALUES ('user789',4,null,'confermato','1/05/2023','giocatore',null,null);
+INSERT INTO Iscrive VALUES ('user001',4,null,'confermato','1/05/2023','giocatore',null,null);
+INSERT INTO Iscrive VALUES ('user002',4,null,'confermato','1/05/2023','giocatore',null,null);
+INSERT INTO Iscrive VALUES ('user003',4,null,'confermato','1/05/2023','giocatore',null,null);
+INSERT INTO Iscrive VALUES ('user004',4,null,'confermato','1/05/2023','giocatore',null,null);
+
+-- Squadra 8 evento 4 Tema Italy Mondiale
+INSERT INTO Iscrive VALUES ('user006',4,null,'confermato','1/05/2023','giocatore',null,null);
+INSERT INTO Iscrive VALUES ('user007',4,null,'confermato','1/05/2023','giocatore',null,null);
+INSERT INTO Iscrive VALUES ('user008',4,null,'confermato','1/05/2023','giocatore',null,null);
+INSERT INTO Iscrive VALUES ('user009',4,null,'confermato','1/05/2023','giocatore',null,null);
+INSERT INTO Iscrive VALUES ('user010',4,null,'confermato','1/05/2023','giocatore',null,null);
+INSERT INTO Iscrive VALUES ('user011',4,null,'confermato','1/05/2023','giocatore',null,null);
+INSERT INTO Iscrive VALUES ('user012',4,null,'confermato','1/05/2023','giocatore',null,null);
+
+--squadra 10 gioca evento 9 FCBarcellona Champions League 
+INSERT INTO Iscrive VALUES ('user123',9,null,'confermato','10/07/2024','giocatore',null,null);
+INSERT INTO Iscrive VALUES ('user456',9,null,'confermato','10/07/2024','giocatore',null,null);
+INSERT INTO Iscrive VALUES ('user789',9,null,'confermato','10/07/2024','giocatore',null,null);
+INSERT INTO Iscrive VALUES ('user001',9,null,'confermato','10/07/2024','giocatore',null,null);
+INSERT INTO Iscrive VALUES ('user002',9,null,'confermato','10/07/2024','giocatore',null,null);
+INSERT INTO Iscrive VALUES ('user003',9,null,'confermato','10/07/2024','giocatore',null,null);
+INSERT INTO Iscrive VALUES ('user025',9,null,'confermato','10/07/2024','giocatore',null,null);
+
+-- Squadra 11 evento 9 Tema Real Madrid Champions League
+INSERT INTO Iscrive VALUES ('user006',9,null,'confermato','10/07/2024','giocatore',null,null);
+INSERT INTO Iscrive VALUES ('user007',9,null,'confermato','10/07/2024','giocatore',null,null);
+INSERT INTO Iscrive VALUES ('user008',9,null,'confermato','10/07/2024','giocatore',null,null);
+INSERT INTO Iscrive VALUES ('user009',9,null,'confermato','10/07/2024','giocatore',null,null);
+INSERT INTO Iscrive VALUES ('user010',9,null,'confermato','10/07/2024','giocatore',null,null);
+INSERT INTO Iscrive VALUES ('user011',9,null,'confermato','10/07/2024','giocatore',null,null);
+INSERT INTO Iscrive VALUES ('user026',9,null,'confermato','10/07/2024','giocatore',null,null);
+
+--squadra 1 gioca evento 6 Boston NBA
+INSERT INTO Iscrive VALUES ('user123',6,null,'confermato','10/05/2024','giocatore',null,null);
+INSERT INTO Iscrive VALUES ('user456',6,null,'confermato','10/05/2024','giocatore',null,null);
+INSERT INTO Iscrive VALUES ('user789',6,null,'confermato','10/05/2024','giocatore',null,null);
+INSERT INTO Iscrive VALUES ('user001',6,null,'confermato','10/05/2024','giocatore',null,null);
+INSERT INTO Iscrive VALUES ('user002',6,null,'confermato','10/05/2024','giocatore',null,null);
+INSERT INTO Iscrive VALUES ('user003',6,null,'confermato','10/05/2024','giocatore',null,null);
+INSERT INTO Iscrive VALUES ('user004',6,null,'confermato','10/05/2024','giocatore',null,null);
+
+-- Squadra 7 evento 6 Los Angeles NBA
+INSERT INTO Iscrive VALUES ('user006',6,null,'confermato','10/05/2024','giocatore',null,null);
+INSERT INTO Iscrive VALUES ('user007',6,null,'confermato','10/05/2024','giocatore',null,null);
+INSERT INTO Iscrive VALUES ('user008',6,null,'confermato','10/05/2024','giocatore',null,null);
+INSERT INTO Iscrive VALUES ('user009',6,null,'confermato','10/05/2024','giocatore',null,null);
+INSERT INTO Iscrive VALUES ('user010',6,null,'confermato','10/05/2024','giocatore',null,null);
+INSERT INTO Iscrive VALUES ('user011',6,null,'confermato','10/05/2024','giocatore',null,null);
+INSERT INTO Iscrive VALUES ('user012',6,null,'confermato','10/05/2024','giocatore',null,null);
+
+-- Squadre 3 e 13 Roland Garros evento 2
+INSERT INTO Iscrive VALUES ('user013',2,null,'confermato','25/08/2023','giocatore',null,null);
+INSERT INTO Iscrive VALUES ('user014',2,null,'confermato','25/08/2023','giocatore',null,nul
+
+
+
+
+
+
+
