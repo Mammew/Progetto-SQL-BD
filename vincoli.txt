@@ -9,7 +9,10 @@
 
 - Squadra
 	-Le Squadre iscritte ad un Torneo possono Partecipare solo ad Eventi del Torneo (trigger)
+	-le Squadre che non hanno ancora il numero minimo di partecipanti possono iscriversi a un Torneo
+	-Tali squadre se entro la data limite non hanno raggiunto il numero minimo di giocatori saranno disiscritte
 
 - Punti_segnati
 	- Dopo ogni evento verranno inseriti i punti degli Utenti aventi preso parte all'Evento
+
 	

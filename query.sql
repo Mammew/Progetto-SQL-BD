@@ -44,6 +44,8 @@ CREATE VIEW Programma(Impianto, Mese,Numero_Torneo, Numero_Eventi, Categoria, Nu
 /*************************************************************************************************************************************************************************/ 
 -- La query è stata interpretata come candidatura alle Squadre in quanto se un Utente viene accettato allora seguirà la sua candidatura
 -- ad una squadra. Tale Squadra sarà creata nella quale vi saranno, naturlamente, tutti gli Utenti confermati per l'Evento
+/* inserire qui i comandi SQL per la creazione della query senza rimuovere la specifica nel commento precedente */ 
+
 Select * 
 from(
 		Select Username User
@@ -64,7 +66,6 @@ from(
 		from Utente u2 natural join Candidatura c2 join Iscrive i2 on i2.Username = u2.Username
 		where c2.stato = 'accettato' OR i2.stato = 'accettato'
 	);
-/* inserire qui i comandi SQL per la creazione della query senza rimuovere la specifica nel commento precedente */ 
 
 /*************************************************************************************************************************************************************************/ 
 /* 3b: determinare gli utenti che hanno partecipato ad almeno un evento di ogni categoria */
@@ -119,7 +120,7 @@ Having count(Username) >= ALL (Select count(Username)
 /*************************************************************************************************************************************************************************/ 
 
 /* inserire qui i comandi SQL per la creazione della funzione senza rimuovere la specifica nel commento precedente */ 
-Create FUNCTION is_part_of_team(Person varchar)
+CREATE OR REPLACE FUNCTION is_part_of_team(Person varchar)
 RETURNS boolean
 AS $$
 BEGIN
@@ -178,7 +179,7 @@ $$
 LANGUAGE plpgsql;
 
 -------------------------------------------------------------------------
-CREATE FUNCTION user_category_level(Pers varchar, Cat decimal)
+CREATE OR REPLACE FUNCTION user_category_level(Pers varchar, Cat decimal)
 RETURNS DECIMAL
 AS $$
 Declare
@@ -233,7 +234,7 @@ LANGUAGE plpgsql;
 --Select* From user_category_level('user456',1);
 ------------------------------------------------------------------------------
 
-CREATE FUNCTION find_last_match(Pers varchar, Cat decimal)
+CREATE OR REPLACE FUNCTION find_last_match(Pers varchar, Cat decimal)
 RETURNS DECIMAL
 AS $$
 DECLARE
@@ -302,7 +303,7 @@ dalla categoria */
 /* inserire qui i comandi SQL per la creazione del trigger senza rimuovere la specifica nel commento precedente */ 
 /* Trigger per impedire l'iscrizione a eventi chiusi*/
 
-CREATE FUNCTION check_event_closed()
+CREATE OR REPLACE FUNCTION check_event_closed()
 RETURNS TRIGGER AS $$
 BEGIN
     -- Verifica se l'evento è chiuso
