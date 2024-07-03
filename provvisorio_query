@@ -58,13 +58,13 @@ from(
 	)
 	UNION
 	(
-		Select u1.Username User
-		from Utente u1 natural join Candidatura c1 join Iscrive i1 on i1.Username = u1.Username
-		where c1.stato = 'rifiutato' OR i1.stato = 'rifiutato'
+		Select Username User
+		from Utente natural join Candidatura
+		where stato = 'rifiutato'
 		EXCEPT
-		Select u2.Username User
-		from Utente u2 natural join Candidatura c2 join Iscrive i2 on i2.Username = u2.Username
-		where c2.stato = 'accettato' OR i2.stato = 'accettato'
+		Select Username User
+		from Utente natural join Candidatura
+		where stato = 'accettato'
 	);
 
 /*************************************************************************************************************************************************************************/ 
@@ -72,28 +72,15 @@ from(
 /*************************************************************************************************************************************************************************/ 
 
 /* inserire qui i comandi SQL per la creazione della query senza rimuovere la specifica nel commento precedente */ 
---join Iscrive on Iscrive.Username = Utente.Username
--- è superflua perche se ha preso parte all'evento allora è stato messo in una Squadra.
 
 Select Username
 from (Select distinct Utente.Username, Categoria
-		from Utente --natural join Iscrive
-	  		join Candidatura on Candidatura.Username = Utente.Username
-	  		join Squadra on Candidatura.Squadra = Squadra.ID
-	  		join Partecipa p on p.Squadra_ID = Squadra.ID
-	  		join Evento on p.Evento_ID = Evento.ID
-		where  Candidatura.stato = 'accettato' AND Evento.data <= current_date)
+		from Utente natural join Iscrive
+	  		join Evento on Iscrive.ID = Evento.ID
+		where  Iscrive.stato = 'confermato' AND Evento.data <= current_date)
 group by Username
 HAVING count (distinct Categoria) = (Select count (*) from Categoria);
 
-/*Union
-Select Username
-from (Select distinct Utente.Username, Categoria
-		from Utente natural join Candidatura join Partecipa on Candidatura.Squadra = Squadra_ID
-	  		 join Evento on Evento_ID = Evento.ID
-		where Candidatura.stato = 'confermato' AND Evento.data <= current_date)
-group by Username
-HAVING count (distinct Categoria) = (Select count (*) from Categoria)*/
 
 /*************************************************************************************************************************************************************************/ 
 /* 3c: determinare per ogni categoria il corso di laurea più attivo in tale categoria, 
@@ -134,6 +121,9 @@ BEGIN
 	END IF;
 END $$
 LANGUAGE plpgsql;
+
+--Select * from is_part_of_team('FQ30');
+-- Select * from is_part_of_team('simple2');
 
 /*************************************************************************************************************************************************************************/ 
 /* 4b1: funzione che dato un giocatore ne calcoli il livello */
@@ -231,7 +221,7 @@ BEGIN
 END $$
 LANGUAGE plpgsql;
 
---Select* From user_category_level('user456',1);
+--Select* From user_category_level('user123',4);
 
 -----------------------------------------------------------------------------
 
@@ -249,23 +239,23 @@ DECLARE
     partecipanti_femminili DECIMAL;
 BEGIN
     -- Calcolare il totale dei partecipanti provenienti dal corso di studi
-    SELECT COUNT(*) INTO totale_partecipanti
-    FROM Candidatura c
-		JOIN Utente u ON c.Username = u.Username
-    	JOIN Partecipa p ON p.Squadra_ID = c.Squadra
-    	JOIN Evento e ON e.ID = p.Evento_ID
+    SELECT COUNT(distinct i.Username) INTO totale_partecipanti
+    FROM Iscrive i
+		JOIN Utente u ON i.Username = u.Username
+    	--JOIN Partecipa p ON p.Squadra_ID = c.Squadra
+    	JOIN Evento e ON e.ID = i.ID
     WHERE e.Categoria = CategoriaID AND u.corso_di_studi = CorsoDiStudi
-		AND c.stato = 'accettato';
-
+		AND i.stato = 'confermato';
+		
     -- Calcolare il numero di partecipanti femminili provenienti dal corso di studi
-    SELECT COUNT(*) INTO partecipanti_femminili
-    FROM Candidatura c
-		JOIN Utente u ON c.Username = u.Username
-    	JOIN Partecipa p ON p.Squadra_ID = c.Squadra
-    	JOIN Evento e ON e.ID = p.Evento_ID
+    SELECT COUNT(distinct i.Username) INTO partecipanti_femminili
+    FROM Iscrive i
+		JOIN Utente u ON i.Username = u.Username
+    	JOIN Evento e ON e.ID = i.ID
     WHERE e.Categoria = CategoriaID AND u.corso_di_studi = CorsoDiStudi
-		AND c.stato = 'accettato' AND u.genere='F';
-    -- Se il totale dei partecipanti è zero, restituire zero
+		AND i.stato = 'confermato' AND u.genere='F';
+
+	-- Se il totale dei partecipanti è zero, restituire zero
     IF totale_partecipanti = 0 THEN
         RETURN 0;
     ELSE
@@ -276,7 +266,7 @@ END;
 $$ 
 LANGUAGE plpgsql;
 
---Select * from FrazionePartecipantiFemminili(1,'Informatica');
+--Select * from FrazionePartecipantiFemminili(2,'Chimica');
 
 /*************************************************************************************************************************************************************************/ 
 --5. Trigger
@@ -303,7 +293,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 CREATE OR REPLACE TRIGGER trg_check_event_closed
-BEFORE INSERT ON Iscrive
+AFTER INSERT ON Iscrive
 FOR EACH ROW
 EXECUTE FUNCTION check_event_closed();
 
@@ -359,17 +349,19 @@ BEGIN
     SELECT COUNT(*) INTO volte_sede_non_disponibile
     FROM Evento join Categoria on Evento.categoria = categoria.id
     WHERE Impianto = NEW.Impianto
-	 AND (
-        --(NEW.data >= Evento.data AND DATEADD(minute, Categoria.durata , new.data) < DATEADD(minute, Categoria.durata , Evento.data)) 
-		 (NEW.data >= Evento.data AND new.data + INTERVAL '1 minute' * Categoria.durata < Evento.data + INTERVAL '1 minute' * Categoria.durata) 
-		 OR 
-		(new.data < Evento.data AND new.data + INTERVAL '1 minute' * Categoria.durata < Evento.data + INTERVAL '1 minute' * Categoria.durata)
-		 OR
-        (Evento.data < new.data AND Evento.data + INTERVAL '1 minute' * Categoria.durata < new.data + INTERVAL '1 minute' * Categoria.durata) 
-		 OR
-		(new.data < Evento.data AND Evento.data + INTERVAL '1 minute' * Categoria.durata < new.data + INTERVAL '1 minute' * Categoria.durata)
-	 	) ;
-		  
+	 AND 
+	 (
+		 --se finisco dopo l'inizio di un evento E prima della sua fine non va bene
+			((NEW.data + INTERVAL '1 minute' * Categoria.durata) >= Evento.data 
+			 AND ((NEW.data + INTERVAL '1 minute' * Categoria.durata) < Evento.data + INTERVAL '1 minute' * Categoria.durata))
+		OR --se inizio dopo l'inizio di un evento E prima della sua fine non va bene
+        	(NEW.data > Evento.data 
+			 AND (NEW.data < Evento.data + INTERVAL '1 minute' * Categoria.durata)) 
+		OR --se inizio prima E finisco dopo di un evento non va bene
+			(NEW.data < Evento.data 
+			 AND ((Evento.data + INTERVAL '1 minute' * Categoria.durata) < NEW.data + INTERVAL '1 minute' * Categoria.durata))
+	 ) ;
+	 
     IF volte_sede_non_disponibile = 0 THEN
         -- Se la sede è disponibile, conferma la sede
         RETURN NEW;
@@ -393,16 +385,28 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- Applicazione del trigger alla tabella Evento
-CREATE TRIGGER trigger_gestione_sede_evento
+CREATE OR REPLACE TRIGGER trigger_gestione_sede_evento
 BEFORE INSERT OR UPDATE ON Evento
 FOR EACH ROW
 EXECUTE FUNCTION gestione_sede_evento();
 
 --INSERT INTO Evento VALUES (51, '22/06/2024 14:00:00', '21/06/2024 11:00:00', 'TRUE' , 3, 'NBA', 'basket Puggia', 'user123');
 
+-- Inserimento di un Evento in un Impianto occupato nell'ora del nuovo Evento attivazione Trigger trova nuovo Impianto
+/*INSERT INTO Evento VALUES (27, '30/07/2025 18:00:00', '25/07/2025 11:00:00', 'false' , 3, 'US Open', 'tennis Puggia', 'user123');
+
+Select *
+from Evento
+where ID = 27*/
 
 /* 5b2: trigger per il mantenimento dell'attributo derivato livello */
 /*************************************************************************************************************************************************************************/ 
 
 /* inserire qui i comandi SQL per la creazione del trigger lasciando la specifica nel commento precedente corrispondente al trigger realizzato tra le due alternative proposte per b.,
 a seconda che il livello del giocatore sia memorizzato o meno */ 
+
+
+
+
+
+
