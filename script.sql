@@ -13,7 +13,7 @@ CREATE TABLE Utente(
 	telefono decimal (9,0) not null,
 	password varchar (20) not null,
 	affidabile boolean not null default true,
-	matricola varchar (9) not null,
+	matricola decimal (7,0) not null,
 	luogoN varchar(25) not null,
 	dataN timestamp not null check(dataN < current_date),
 	UNIQUE (telefono),
@@ -251,112 +251,112 @@ CREATE TABLE Partecipa (
 );
 
 INSERT INTO Utente (Username, premium, genere,corso_di_studi, cognome, nome, telefono, password, matricola, luogoN, dataN, affidabile)
-VALUES ('user123', true,'M','Informatica', 'Rossi', 'Mario', 123456789, 'password123', '123456789', 'Torino', '1990-01-01',true);
+VALUES ('user123', true,'M','Informatica', 'Rossi', 'Mario', 123456789, 'password123', 1234567, 'Torino', '1990-01-01',true);
 
 --FQ30 utente che è sempre stato rifiutato
 INSERT INTO Utente (Username, genere, corso_di_studi, cognome, nome, telefono, password, matricola, luogoN, dataN)
-VALUES ('FQ30','M','Matematica statistica', 'Queirolo', 'Federico', 163456789, 'password123', '133756789', 'Genova', '2002-12-30');
+VALUES ('FQ30','M','Matematica statistica', 'Queirolo', 'Federico', 163456789, 'password123', 1337567, 'Genova', '2002-12-30');
 
 -- simple non ha mai partecipato a un evento non può valutare
 INSERT INTO Utente (Username, premium, genere, corso_di_studi, cognome, nome, telefono, password, matricola, luogoN, dataN)
-VALUES ('simple2', true,'F','Giurisprudenza', 'Francesca', 'Totti', 128456789, 'password123', '103456789', 'Torino', '1999-01-01');
+VALUES ('simple2', true,'F','Giurisprudenza', 'Francesca', 'Totti', 128456789, 'password123', 1034567, 'Torino', '1999-01-01');
 
 
 -- 2. Insert with optional fields set to default
 INSERT INTO Utente (Username,premium ,genere, corso_di_studi, cognome, nome, telefono, password, matricola, luogoN, dataN, affidabile)
-VALUES ('user456', true, 'M','Informatica', 'Bianchi', 'Anna', 987654321, 'secure_password', '987654321', 'Milano', '1995-07-14', true);
+VALUES ('user456', true, 'M','Informatica', 'Bianchi', 'Anna', 987654321, 'secure_password', 9876543, 'Milano', '1995-07-14', true);
 
 -- 3. Insert with boolean field set to true
 INSERT INTO Utente (Username, premium, genere, corso_di_studi, cognome, nome, telefono, password, matricola, luogoN, dataN)
-VALUES ('user789', true,'M','Giurisprudenza', 'Verdi', 'Giuseppe', 222333444, 'pass1234', '222333444', 'Roma', '2000-12-31');
+VALUES ('user789', true,'M','Giurisprudenza', 'Verdi', 'Giuseppe', 222333444, 'pass1234', 2223334, 'Roma', '2000-12-31');
 
 --- CHAT
 --- tutti dovrebbero avere il campo affidabile perchè l'utente premium vede quel campo su tutti da controllare
 
 INSERT INTO Utente (Username, premium, genere, corso_di_studi, cognome, nome, telefono, password, matricola, luogoN, dataN, affidabile)
-VALUES ('user001', false, 'M', 'Economia', 'Rossi', 'Luigi', 333222111, 'password001', '101010101', 'Napoli', '1992-03-15', true);
+VALUES ('user001', false, 'M', 'Economia', 'Rossi', 'Luigi', 333222111, 'password001', 1010101, 'Napoli', '1992-03-15', true);
 
 INSERT INTO Utente (Username, premium, genere, corso_di_studi, cognome, nome, telefono, password, matricola, luogoN, dataN)
-VALUES ('user002', true, 'M', 'Ingegneria', 'Bianchi', 'Stefano', 444555666, 'password002', '202020202', 'Firenze', '1994-08-21');
+VALUES ('user002', true, 'M', 'Ingegneria', 'Bianchi', 'Stefano', 444555666, 'password002', 2020202, 'Firenze', '1994-08-21');
 
 INSERT INTO Utente (Username, premium, genere, corso_di_studi, cognome, nome, telefono, password, matricola, luogoN, dataN)
-VALUES ('user003', false, 'M', 'Fisica', 'Verdi', 'Marco', 555663777, 'password003', '303030303', 'Bologna', '1991-11-05');
+VALUES ('user003', false, 'M', 'Fisica', 'Verdi', 'Marco', 555663777, 'password003', 3030303, 'Bologna', '1991-11-05');
 
 INSERT INTO Utente (Username, premium, genere, corso_di_studi, cognome, nome, telefono, password, matricola, luogoN, dataN)
-VALUES ('user004', true, 'M', 'Chimica', 'Gialli', 'Filippo', 666747888, 'password004', '404040404', 'Palermo', '1993-02-19');
+VALUES ('user004', true, 'M', 'Chimica', 'Gialli', 'Filippo', 666747888, 'password004', 4040404, 'Palermo', '1993-02-19');
 
 INSERT INTO Utente (Username, premium, genere, corso_di_studi, cognome, nome, telefono, password, matricola, luogoN, dataN)
-VALUES ('user005', false, 'M', 'Biologia', 'Neri', 'Franco', 977888999, 'password005', '505050505', 'Venezia', '1995-05-30');
+VALUES ('user005', false, 'M', 'Biologia', 'Neri', 'Franco', 977888999, 'password005', 5050505, 'Venezia', '1995-05-30');
 
 --- altri sette utenti maschi
 
 INSERT INTO Utente (Username, premium, genere, corso_di_studi, cognome, nome, telefono, password, matricola, luogoN, dataN, affidabile)
-VALUES ('user006', true, 'M', 'Matematica', 'Ferrari', 'Andrea', 888999000, 'password006', '606060606', 'Roma', '1990-04-12', true);
+VALUES ('user006', true, 'M', 'Matematica', 'Ferrari', 'Andrea', 888999000, 'password006', 6060606, 'Roma', '1990-04-12', true);
 
 INSERT INTO Utente (Username, premium, genere, corso_di_studi, cognome, nome, telefono, password, matricola, luogoN, dataN)
-VALUES ('user007', false, 'M', 'Informatica', 'Rossi', 'Alberto', 959000111, 'password007', '707070707', 'Milano', '1992-07-18');
+VALUES ('user007', false, 'M', 'Informatica', 'Rossi', 'Alberto', 959000111, 'password007', 7070707, 'Milano', '1992-07-18');
 
 INSERT INTO Utente (Username, premium, genere, corso_di_studi, cognome, nome, telefono, password, matricola, luogoN, dataN)
-VALUES ('user008', true, 'M', 'Storia', 'Bianchi', 'Davide', 111222333, 'password008', '808080808', 'Torino', '1994-10-02');
+VALUES ('user008', true, 'M', 'Storia', 'Bianchi', 'Davide', 111222333, 'password008', 8080808, 'Torino', '1994-10-02');
 
 INSERT INTO Utente (Username, premium, genere, corso_di_studi, cognome, nome, telefono, password, matricola, luogoN, dataN)
-VALUES ('user009', false, 'M', 'Filosofia', 'Verdi', 'Giorgio', 222933444, 'password009', '909090909', 'Firenze', '1996-01-25');
+VALUES ('user009', false, 'M', 'Filosofia', 'Verdi', 'Giorgio', 222933444, 'password009', 9090909, 'Firenze', '1996-01-25');
 
 INSERT INTO Utente (Username, premium, genere, corso_di_studi, cognome, nome, telefono, password, matricola, luogoN, dataN)
-VALUES ('user010', true, 'M', 'Lettere', 'Neri', 'Paolo', 333444555, 'password010', '101010110', 'Bologna', '1991-12-15');
+VALUES ('user010', true, 'M', 'Lettere', 'Neri', 'Paolo', 333444555, 'password010', 1010201, 'Bologna', '1991-12-15');
 
 INSERT INTO Utente (Username, premium, genere, corso_di_studi, cognome, nome, telefono, password, matricola, luogoN, dataN)
-VALUES ('user011', false, 'M', 'Scienze Politiche', 'Gialli', 'Luca', 404555666, 'password011', '111111111', 'Napoli', '1993-03-05');
+VALUES ('user011', false, 'M', 'Scienze Politiche', 'Gialli', 'Luca', 404555666, 'password011', 1111111, 'Napoli', '1993-03-05');
 
 INSERT INTO Utente (Username, premium, genere, corso_di_studi, cognome, nome, telefono, password, matricola, luogoN, dataN)
-VALUES ('user012', true, 'M', 'Economia', 'Blu', 'Matteo', 855666777, 'password012', '121212821', 'Palermo', '1995-06-23');
+VALUES ('user012', true, 'M', 'Economia', 'Blu', 'Matteo', 855666777, 'password012', 1212128, 'Palermo', '1995-06-23');
 
 --- altri 2 utenti maschi bonus
 INSERT INTO Utente (Username, premium, genere, corso_di_studi, cognome, nome, telefono, password, matricola, luogoN, dataN, affidabile)
-VALUES ('user025', false, 'M', 'Ingegneria Civile', 'Ferrari', 'Luca', 999000111, 'password025', '252525252', 'Firenze', '1993-04-20', true);
+VALUES ('user025', false, 'M', 'Ingegneria Civile', 'Ferrari', 'Luca', 999000111, 'password025', 2525252, 'Firenze', '1993-04-20', true);
 
 INSERT INTO Utente (Username, premium, genere, corso_di_studi, cognome, nome, telefono, password, matricola, luogoN, dataN)
-VALUES ('user026', true, 'M', 'Medicina', 'Moretti', 'Andrea', 911222333, 'password026', '262626262', 'Napoli', '1995-12-12');
+VALUES ('user026', true, 'M', 'Medicina', 'Moretti', 'Andrea', 911222333, 'password026', 2626262, 'Napoli', '1995-12-12');
 
 
 --- 6 utenti donne
 INSERT INTO Utente (Username, premium, genere, corso_di_studi, cognome, nome, telefono, password, matricola, luogoN, dataN, affidabile)
-VALUES ('user013', true, 'F', 'Chimica', 'Marini', 'Chiara', 666777838, 'password013', '131313131', 'Venezia', '1990-05-14', true);
+VALUES ('user013', true, 'F', 'Chimica', 'Marini', 'Chiara', 666777838, 'password013', 1313131, 'Venezia', '1990-05-14', true);
 
 INSERT INTO Utente (Username, premium, genere, corso_di_studi, cognome, nome, telefono, password, matricola, luogoN, dataN)
-VALUES ('user014', false, 'F', 'Chimica', 'Ricci', 'Sofia', 177888999, 'password014', '141414141', 'Genova', '1992-08-22');
+VALUES ('user014', false, 'F', 'Chimica', 'Ricci', 'Sofia', 177888999, 'password014', 1414141, 'Genova', '1992-08-22');
 
 INSERT INTO Utente (Username, premium, genere, corso_di_studi, cognome, nome, telefono, password, matricola, luogoN, dataN)
-VALUES ('user015', true, 'F', 'Fisica', 'Esposito', 'Giulia', 818999000, 'password015', '151515151', 'Roma', '1994-11-09');
+VALUES ('user015', true, 'F', 'Fisica', 'Esposito', 'Giulia', 818999000, 'password015', 1515151, 'Roma', '1994-11-09');
 
 INSERT INTO Utente (Username, premium, genere, corso_di_studi, cognome, nome, telefono, password, matricola, luogoN, dataN)
-VALUES ('user016', false, 'F', 'Medicina', 'Conti', 'Martina', 199000111, 'password016', '161616161', 'Napoli', '1996-02-28');
+VALUES ('user016', false, 'F', 'Medicina', 'Conti', 'Martina', 199000111, 'password016', 1616161, 'Napoli', '1996-02-28');
 
 INSERT INTO Utente (Username, premium, genere, corso_di_studi, cognome, nome, telefono, password, matricola, luogoN, dataN)
-VALUES ('user017', true, 'F', 'Farmacia', 'Moretti', 'Valentina', 115222333, 'password017', '171717171', 'Milano', '1991-09-17');
+VALUES ('user017', true, 'F', 'Farmacia', 'Moretti', 'Valentina', 115222333, 'password017', 1717171, 'Milano', '1991-09-17');
 
 INSERT INTO Utente (Username, premium, genere, corso_di_studi, cognome, nome, telefono, password, matricola, luogoN, dataN)
-VALUES ('user018', false, 'F', 'Ingegneria', 'Barbieri', 'Elena', 222336444, 'password018', '181818181', 'Firenze', '1993-12-21');
+VALUES ('user018', false, 'F', 'Ingegneria', 'Barbieri', 'Elena', 222336444, 'password018', 1818181, 'Firenze', '1993-12-21');
 
 --- 6 utenti donne
 
 INSERT INTO Utente (Username, premium, genere, corso_di_studi, cognome, nome, telefono, password, matricola, luogoN, dataN)
-VALUES ('user019', true, 'F', 'Architettura', 'Greco', 'Federica', 339444555, 'password019', '191919191', 'Bologna', '1995-04-07');
+VALUES ('user019', true, 'F', 'Architettura', 'Greco', 'Federica', 339444555, 'password019', 1919191, 'Bologna', '1995-04-07');
 
 INSERT INTO Utente (Username, premium, genere, corso_di_studi, cognome, nome, telefono, password, matricola, luogoN, dataN, affidabile)
-VALUES ('user020', true, 'F', 'Psicologia', 'Bianchi', 'Laura', 434555666, 'password020', '205020202', 'Pisa', '1990-03-25', true);
+VALUES ('user020', true, 'F', 'Psicologia', 'Bianchi', 'Laura', 434555666, 'password020', 2050202, 'Pisa', '1990-03-25', true);
 
 INSERT INTO Utente (Username, premium, genere, corso_di_studi, cognome, nome, telefono, password, matricola, luogoN, dataN)
-VALUES ('user021', false, 'F', 'Scienze Politiche', 'Rossi', 'Alessia', 555666777, 'password021', '212121212', 'Palermo', '1992-07-15');
+VALUES ('user021', false, 'F', 'Scienze Politiche', 'Rossi', 'Alessia', 555666777, 'password021', 2121212, 'Palermo', '1992-07-15');
 
 INSERT INTO Utente (Username, premium, genere, corso_di_studi, cognome, nome, telefono, password, matricola, luogoN, dataN)
-VALUES ('user022', true, 'F', 'Economia', 'Gallo', 'Sara', 666777888, 'password022', '222222222', 'Cagliari', '1994-11-30');
+VALUES ('user022', true, 'F', 'Economia', 'Gallo', 'Sara', 666777888, 'password022', 2222222, 'Cagliari', '1994-11-30');
 
 INSERT INTO Utente (Username, premium, genere, corso_di_studi, cognome, nome, telefono, password, matricola, luogoN, dataN)
-VALUES ('user023', false, 'F', 'Lettere', 'Fontana', 'Elisa', 777888999, 'password023', '232323232', 'Ancona', '1996-02-10');
+VALUES ('user023', false, 'F', 'Lettere', 'Fontana', 'Elisa', 777888999, 'password023', 2323232, 'Ancona', '1996-02-10');
 
 INSERT INTO Utente (Username, premium, genere, corso_di_studi, cognome, nome, telefono, password, matricola, luogoN, dataN)
-VALUES ('user024', true, 'F', 'Giurisprudenza', 'Conti', 'Beatrice', 788999000, 'password024', '242424242', 'Trento', '1998-09-05');
+VALUES ('user024', true, 'F', 'Giurisprudenza', 'Conti', 'Beatrice', 788999000, 'password024', 2424242, 'Trento', '1998-09-05');
 
 
 INSERT INTO Categoria VALUES(1,'Basket' ,10, 42,'si gioca 5 Vs 5 regole del Basket FIBA', false);
@@ -790,4 +790,3 @@ INSERT INTO Iscrive VALUES ('user007',21,null,'confermato','16/06/2024 12:00:20'
 INSERT INTO Iscrive VALUES ('user009',21,null,'confermato','16/06/2024 12:00:20','giocatore',null,null);
 INSERT INTO Iscrive VALUES ('user010',21,null,'confermato','16/06/2024 12:00:20','giocatore',null,null);
 /***********************************************************************************************************************/
-
