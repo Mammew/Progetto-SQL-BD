@@ -295,7 +295,7 @@ CREATE OR REPLACE FUNCTION check_event_closed()
 RETURNS TRIGGER AS $$
 BEGIN
     -- Verifica se l'evento è chiuso
-    IF (SELECT stato FROM Evento WHERE ID = NEW.ID) = 'CHIUSO' THEN
+    IF (SELECT stato FROM Evento WHERE ID = NEW.ID) = 'chiuso' THEN
         RAISE EXCEPTION 'Non è possibile iscriversi a un evento chiuso.';
     END IF;
     RETURN NEW;
@@ -328,7 +328,7 @@ BEGIN
     -- Se il numero di partecipanti è uguale o superiore al numero di giocatori previsto, chiudo l'evento
     IF num_partecipanti >= num_giocatori_categoria THEN
         UPDATE Evento
-        SET stato = 'CHIUSO'
+        SET stato = 'chiuso'
         WHERE ID = NEW.ID;
     END IF;
     

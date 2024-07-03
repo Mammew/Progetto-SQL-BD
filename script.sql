@@ -15,7 +15,7 @@ CREATE TABLE Utente(
 	affidabile boolean not null default true,
 	matricola varchar (9) not null,
 	luogoN varchar(25) not null,
-	dataN DATETIME not null check(dataN < current_date),
+	dataN timestamp not null check(dataN < current_date),
 	UNIQUE (telefono),
 	UNIQUE (matricola)
 );
@@ -73,10 +73,10 @@ CREATE TABLE Torneo (
 CREATE TABLE Squadra(
 	ID decimal (5,0) not null PRIMARY KEY,
 	NomeS varchar(25) not null,
-	Torneo varchar(30) not null REFERENCES Torneo (NomeT), -- forse serve il not null
+	Torneo varchar(30) not null REFERENCES Torneo (NomeT),
 	Organizzatore varchar (25) not null REFERENCES Utente(Username) CHECK (is_organizzatore_premium(Organizzatore)),
 	num_giocatori_max decimal (2,0) not null,
-	num_giocatori_min decimal (2,0) not null check (num_giocatori_min < num_giocatori_max),
+	num_giocatori_min decimal (2,0) not null check (num_giocatori_min <= num_giocatori_max),
 	colore_maglia varchar (15),
 	stato varchar(6) not null default 'aperto' check (stato in ('aperto','chiuso')),
 	descrizione varchar (100),
@@ -98,7 +98,7 @@ CREATE TABLE Candidatura(
 	Username varchar (25) not null REFERENCES Utente (Username),
 	Squadra decimal (5,0) not null REFERENCES Squadra (ID),
 	stato varchar(9) check (stato in ('accettato','rifiutato')),
-	data DATETIME  default current_date,
+	data timestamp  default current_date,
 	PRIMARY KEY(Username,Squadra)
 );
 
@@ -168,8 +168,8 @@ CREATE TABLE Impianto (
 
 CREATE TABLE Evento (
 	ID decimal (5,0) not null PRIMARY KEY,
-	data DATETIME  not null,
-	data_disiscrizione DATETIME  not null check(data_disiscrizione < data),
+	data timestamp  not null,
+	data_disiscrizione timestamp  not null check(data_disiscrizione < data),
 	foto boolean not null DEFAULT false,
 	Categoria decimal(5,0) not null REFERENCES Categoria (ID),
 	Torneo varchar(30) REFERENCES Torneo (NomeT),
@@ -230,7 +230,7 @@ CREATE TABLE Iscrive(
 	ID decimal(5,0) not null REFERENCES Evento(ID),
 	Sostituto varchar (25) REFERENCES Utente(Username) check (user_not_in_this_event(Sostituto, ID)),
 	stato varchar(10) check (stato in ('rifiutato','confermato')),
-	data DATETIME  not null default current_date,
+	data timestamp  not null default current_date,
 	ruolo varchar(10) not null check (ruolo in ('giocatore','arbitro')),
 	ritardo boolean,
 	no_show boolean,
@@ -249,7 +249,6 @@ CREATE TABLE Partecipa (
 	punti_segnati decimal(3,0),
 	PRIMARY KEY(Squadra_ID, Evento_ID)
 );
-
 
 INSERT INTO Utente (Username, premium, genere,corso_di_studi, cognome, nome, telefono, password, matricola, luogoN, dataN, affidabile)
 VALUES ('user123', true,'M','Informatica', 'Rossi', 'Mario', 123456789, 'password123', '123456789', 'Torino', '1990-01-01',true);
@@ -322,7 +321,7 @@ VALUES ('user026', true, 'M', 'Medicina', 'Moretti', 'Andrea', 911222333, 'passw
 
 --- 6 utenti donne
 INSERT INTO Utente (Username, premium, genere, corso_di_studi, cognome, nome, telefono, password, matricola, luogoN, dataN, affidabile)
-VALUES ('user013', true, 'F', 'Biologia', 'Marini', 'Chiara', 666777838, 'password013', '131313131', 'Venezia', '1990-05-14', true);
+VALUES ('user013', true, 'F', 'Chimica', 'Marini', 'Chiara', 666777838, 'password013', '131313131', 'Venezia', '1990-05-14', true);
 
 INSERT INTO Utente (Username, premium, genere, corso_di_studi, cognome, nome, telefono, password, matricola, luogoN, dataN)
 VALUES ('user014', false, 'F', 'Chimica', 'Ricci', 'Sofia', 177888999, 'password014', '141414141', 'Genova', '1992-08-22');
@@ -437,6 +436,7 @@ INSERT INTO Candidatura VALUES('user002', 1,'accettato');
 INSERT INTO Candidatura VALUES('user003', 1,'accettato');
 INSERT INTO Candidatura VALUES('user004', 1,'accettato');
 
+
 INSERT INTO Candidatura VALUES('FQ30', 1,'rifiutato');
 
 --- squadra 7 gioca sempre a NBA
@@ -453,6 +453,7 @@ INSERT INTO Candidatura VALUES('FQ30', 7,'rifiutato');
 -- Squadre 3 e 13 roland garros
 INSERT INTO Candidatura VALUES('user013', 3,'accettato');
 INSERT INTO Candidatura VALUES('user014', 13,'accettato');
+
 
 -- Squadra 6 gioca a calcio Mondiale
 INSERT INTO Candidatura VALUES('user123', 6,'accettato');
@@ -587,7 +588,13 @@ INSERT INTO Evento VALUES (4, '24/06/2024 17:00:00', '22/06/2024 11:00:00', 'fal
 INSERT INTO Evento VALUES (5, '30/06/2024 11:00:00', '22/06/2024 11:00:00', 'false' , 1, 'NBA', 'basket Puggia', 'user789');
 INSERT INTO Evento VALUES (6, '29/06/2024 12:00:00', '22/06/2024 11:00:00', 'false' , 1, 'NBA', 'basket Puggia', 'user789');
 INSERT INTO Evento VALUES (7, '01/07/2024 19:00:00', '30/06/2024 11:00:00', 'true', 2, 'World Volleyball Championship', 'pallavolo Puggia', 'user456');
--->INSERT INTO Evento VALUES (8, '05/07/2024', '04/07/2024', 'false', 3, 'Wimbledon', 'tennis Puggia', 'user123');
+
+--EVENTO CHE CHIUDO PERCHè NON è ARRIVATO AL NUMERO MINIMO DI PARTECIPANTI
+/*INSERT INTO Evento VALUES (8, '05/04/2024', '03/04/2024', 'false', 3, 'Wimbledon', 'tennis Puggia', 'user123');
+UPDATE Evento
+SET stato = 'chiuso'
+WHERE ID = 8;*/
+
 INSERT INTO Evento VALUES (9, '15/07/2024 15:00:00', '13/07/2024 11:00:00', 'true', 4, 'Champions League', 'calcio Gambaro', 'user789');
 INSERT INTO Evento VALUES (10, '15/07/2024 18:00:00', '14/07/2024 11:00:00', 'false', 1, 'Euroleague', 'basket Puggia', 'user456');
 INSERT INTO Evento VALUES (11, '20/07/2024 20:00:00', '19/07/2024 11:00:00', 'true', 2, 'FIVB', 'pallavolo Puggia', 'user789');
@@ -597,7 +604,14 @@ INSERT INTO Evento VALUES (11, '20/07/2024 20:00:00', '19/07/2024 11:00:00', 'tr
 INSERT INTO Evento VALUES (15, '10/08/2025 18:00:00', '08/08/2025 11:00:00', 'true', 2, 'Olympics', 'pallavolo Puggia', 'user456');
 INSERT INTO Evento VALUES (16, '10/08/2024 15:00:00', '09/08/2024 11:00:00', 'false', 4, 'Mondiale', 'calcio Gambaro', 'user789');
 INSERT INTO Evento VALUES (17, '30/07/2025 18:00:00', '28/07/2025 11:00:00', 'TRUE' , 3, 'US Open', 'tennis Puggia', 'user123');
-------
+----
+INSERT INTO Evento VALUES (19, '30/07/2025 18:00:00', '25/07/2025 11:00:00', 'false' , 3, 'US Open', 'tennis Puggia', 'user123');
+----
+-- Eventi per far partecipare a tutte le categorie l'Utente 'user123'
+INSERT INTO Evento VALUES (22, '21/06/2024 13:00:00', '20/06/2024 11:00:00', 'false' , 3, null, 'tennis Puggia', 'user123');
+INSERT INTO Evento VALUES (21, '20/06/2024 13:00:00', '18/06/2024 11:00:00', 'false' , 2, null, 'pallavolo Puggia', 'user123');
+
+
 --Partecipazione di Boston (Squadra_ID = 1) all evento NBA (Evento_ID = 5)
 INSERT INTO Partecipa VALUES (1, 5, 85);
 
@@ -745,9 +759,35 @@ INSERT INTO Iscrive VALUES ('user012',6,null,'confermato','10/05/2024 11:00:00',
 INSERT INTO Iscrive VALUES ('user013',2,null,'confermato','25/08/2023 11:00:00','giocatore',null,null);
 INSERT INTO Iscrive VALUES ('user014',2,null,'confermato','25/08/2023 11:00:00','giocatore',null,null);
 
+/***********************************************************************************************************************/
+-- Inserimento di 3 user nell evento 19 attivazione TRIGGER chiusura Evento e TRIGGER che blocca Iscrizioni ad Eventi 'chiusi'
+INSERT INTO Iscrive VALUES ('user013',19,null,'confermato','25/08/2023 11:00:00','giocatore',null,null);
+INSERT INTO Iscrive VALUES ('user014',19,null,'confermato','25/08/2023 11:00:00','giocatore',null,null);
+-- Questa INSERT fa sollevare l'eccezione
+--INSERT INTO Iscrive VALUES ('user015',19,null, 'confermato','25/08/2023 11:00:00','giocatore',null,null);
+/***********************************************************************************************************************/
 
+-- Inserimento di un Evento in un Impianto occupato nell'ora del nuovo Evento attivazione Trigger trova nuovo Impianto
+INSERT INTO Evento VALUES (20, '30/07/2025 18:00:00', '25/07/2025 11:00:00', 'false' , 3, 'US Open', 'tennis Puggia', 'user123');
 
+/***********************************************************************************************************************/
+--INSERT INTO Iscrive per far si che l'Utente 'user123' partecipi ad ogni categoria
+-- Tennis
+INSERT INTO Iscrive VALUES ('user123',22,null,'confermato','20/06/2024 12:24:52','giocatore',null,null);
+INSERT INTO Iscrive VALUES ('FQ30',22,null,'confermato','18/06/2024 10:54:20','giocatore',null,null);
+-- Pallavolo
+INSERT INTO Iscrive VALUES ('user123',21,null,'confermato','16/06/2024 12:00:20','giocatore',null,null);
+INSERT INTO Iscrive VALUES ('user008',21,null,'confermato','16/06/2024 12:00:20','giocatore',null,null);
+INSERT INTO Iscrive VALUES ('user456',21,null,'confermato','16/06/2024 12:00:20','giocatore',null,null);
+INSERT INTO Iscrive VALUES ('user001',21,null,'confermato','16/06/2024 12:00:20','giocatore',null,null);
+INSERT INTO Iscrive VALUES ('user002',21,null,'confermato','16/06/2024 12:00:20','giocatore',null,null);
+INSERT INTO Iscrive VALUES ('user003',21,null,'confermato','16/06/2024 12:00:20','giocatore',null,null);
 
-
-
+INSERT INTO Iscrive VALUES ('user004',21,null,'confermato','16/06/2024 12:00:20','giocatore',null,null);
+INSERT INTO Iscrive VALUES ('user005',21,null,'confermato','16/06/2024 12:00:20','giocatore',null,null);
+INSERT INTO Iscrive VALUES ('user006',21,null,'confermato','16/06/2024 12:00:20','giocatore',null,null);
+INSERT INTO Iscrive VALUES ('user007',21,null,'confermato','16/06/2024 12:00:20','giocatore',null,null);
+INSERT INTO Iscrive VALUES ('user009',21,null,'confermato','16/06/2024 12:00:20','giocatore',null,null);
+INSERT INTO Iscrive VALUES ('user010',21,null,'confermato','16/06/2024 12:00:20','giocatore',null,null);
+/***********************************************************************************************************************/
 

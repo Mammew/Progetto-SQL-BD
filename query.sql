@@ -74,15 +74,15 @@ from(
 /* inserire qui i comandi SQL per la creazione della query senza rimuovere la specifica nel commento precedente */ 
 --join Iscrive on Iscrive.Username = Utente.Username
 -- è superflua perche se ha preso parte all'evento allora è stato messo in una Squadra.
+select *
+from Iscrive
+where Username = 'user123'
 
 Select Username
 from (Select distinct Utente.Username, Categoria
-		from Utente --natural join Iscrive
-	  		join Candidatura on Candidatura.Username = Utente.Username
-	  		join Squadra on Candidatura.Squadra = Squadra.ID
-	  		join Partecipa p on p.Squadra_ID = Squadra.ID
-	  		join Evento on p.Evento_ID = Evento.ID
-		where  Candidatura.stato = 'accettato' AND Evento.data <= current_date)
+		from Utente natural join Iscrive
+	  		join Evento on Iscrive.ID = Evento.ID
+		where  Iscrive.stato = 'confermato' AND Evento.data <= current_date)
 group by Username
 HAVING count (distinct Categoria) = (Select count (*) from Categoria);
 
@@ -134,6 +134,9 @@ BEGIN
 	END IF;
 END $$
 LANGUAGE plpgsql;
+
+-- Select * from is_part_of_team('FQ30');
+-- Select * from is_part_of_team('user456');
 
 /*************************************************************************************************************************************************************************/ 
 /* 4b1: funzione che dato un giocatore ne calcoli il livello */
@@ -231,7 +234,7 @@ BEGIN
 END $$
 LANGUAGE plpgsql;
 
---Select* From user_category_level('user456',1);
+--Select* From user_category_level('user456',4);
 
 -----------------------------------------------------------------------------
 
@@ -249,23 +252,23 @@ DECLARE
     partecipanti_femminili DECIMAL;
 BEGIN
     -- Calcolare il totale dei partecipanti provenienti dal corso di studi
-    SELECT COUNT(*) INTO totale_partecipanti
-    FROM Candidatura c
-		JOIN Utente u ON c.Username = u.Username
-    	JOIN Partecipa p ON p.Squadra_ID = c.Squadra
-    	JOIN Evento e ON e.ID = p.Evento_ID
+    SELECT COUNT(distinct i.Username) INTO totale_partecipanti
+    FROM Iscrive i
+		JOIN Utente u ON i.Username = u.Username
+    	--JOIN Partecipa p ON p.Squadra_ID = c.Squadra
+    	JOIN Evento e ON e.ID = i.ID
     WHERE e.Categoria = CategoriaID AND u.corso_di_studi = CorsoDiStudi
-		AND c.stato = 'accettato';
-
+		AND i.stato = 'confermato';
+		
     -- Calcolare il numero di partecipanti femminili provenienti dal corso di studi
-    SELECT COUNT(*) INTO partecipanti_femminili
-    FROM Candidatura c
-		JOIN Utente u ON c.Username = u.Username
-    	JOIN Partecipa p ON p.Squadra_ID = c.Squadra
-    	JOIN Evento e ON e.ID = p.Evento_ID
+    SELECT COUNT(distinct i.Username) --INTO partecipanti_femminili
+    FROM Iscrive i
+		JOIN Utente u ON i.Username = u.Username
+    	JOIN Evento e ON e.ID = i.ID
     WHERE e.Categoria = CategoriaID AND u.corso_di_studi = CorsoDiStudi
-		AND c.stato = 'accettato' AND u.genere='F';
-    -- Se il totale dei partecipanti è zero, restituire zero
+		AND i.stato = 'confermato' AND u.genere='F';
+
+	-- Se il totale dei partecipanti è zero, restituire zero
     IF totale_partecipanti = 0 THEN
         RETURN 0;
     ELSE
@@ -276,7 +279,7 @@ END;
 $$ 
 LANGUAGE plpgsql;
 
---Select * from FrazionePartecipantiFemminili(1,'Informatica');
+Select * from FrazionePartecipantiFemminili(3,'Chimica');
 
 /*************************************************************************************************************************************************************************/ 
 --5. Trigger
@@ -295,21 +298,21 @@ CREATE OR REPLACE FUNCTION check_event_closed()
 RETURNS TRIGGER AS $$
 BEGIN
     -- Verifica se l'evento è chiuso
-    IF (SELECT stato FROM Evento WHERE ID = NEW.ID_evento) = 'CHIUSO' THEN
+    IF (SELECT stato FROM Evento WHERE ID = NEW.ID) = 'chiuso' THEN
         RAISE EXCEPTION 'Non è possibile iscriversi a un evento chiuso.';
     END IF;
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER trg_check_event_closed
-BEFORE INSERT ON Iscrive
+CREATE OR REPLACE TRIGGER trg_check_event_closed
+AFTER INSERT ON Iscrive
 FOR EACH ROW
 EXECUTE FUNCTION check_event_closed();
 
 /*Trigger per aggiornare lo stato dell'evento a "CHIUSO"*/
 
-CREATE FUNCTION close_event_if_full()
+CREATE OR REPLACE FUNCTION close_event_if_full()
 RETURNS TRIGGER AS $$
 DECLARE
     num_giocatori_categoria INT;
@@ -318,25 +321,26 @@ BEGIN
     -- il numero di giocatori previsto dalla categoria
     SELECT num_giocatori INTO num_giocatori_categoria
     FROM Categoria
-    WHERE ID = (SELECT Categoria FROM Evento WHERE ID = NEW.ID_evento);
+    WHERE ID = (SELECT Categoria FROM Evento WHERE ID = NEW.ID);
     
     --il numero di partecipanti attuali all'evento
     SELECT COUNT(*) INTO num_partecipanti
     FROM Iscrive
-    WHERE ID_evento = NEW.ID_evento AND stato = 'confermato';
+    WHERE Iscrive.ID = NEW.ID AND stato = 'confermato';
     
     -- Se il numero di partecipanti è uguale o superiore al numero di giocatori previsto, chiudo l'evento
     IF num_partecipanti >= num_giocatori_categoria THEN
         UPDATE Evento
-        SET stato = 'CHIUSO'
-        WHERE ID = NEW.ID_evento;
+        SET stato = 'chiuso'
+        WHERE ID = NEW.ID;
     END IF;
     
     RETURN NEW;
 END;
-$$ LANGUAGE plpgsql;
+$$ 
+LANGUAGE plpgsql;
 
-CREATE TRIGGER trg_close_event_if_full
+CREATE OR REPLACE TRIGGER trg_close_event_if_full
 AFTER INSERT OR UPDATE ON Iscrive
 FOR EACH ROW
 EXECUTE FUNCTION close_event_if_full();
@@ -351,40 +355,32 @@ quello meno utilizzato nel mese in corso (vedi vista Programma) */
 CREATE OR REPLACE FUNCTION gestione_sede_evento() 
 RETURNS TRIGGER AS $$
 DECLARE
-    volte_sede_non_disponibile BOOLEAN;
+    volte_sede_non_disponibile decimal;
     sede_alternativa RECORD;
 BEGIN
     -- Verifica se la sede è disponibile nel periodo dell'evento 
     SELECT COUNT(*) INTO volte_sede_non_disponibile
     FROM Evento join Categoria on Evento.categoria = categoria.id
     WHERE Impianto = NEW.Impianto
-	 AND (
-        (NEW.data >= Evento.data 
-		 AND 
-		 DATEADD(minute, Categoria.durata , new.data) < DATEADD(minute, Categoria.durata , Evento.data) ) 
-		 OR
-		 (new.data < Evento.data 
-		  AND 
-		  DATEADD(minute, Categoria.durata , new.data) < DATEADD(minute, Categoria.durata , Evento.data)
-		 )
-		 OR
-        (Evento.data < new.data 
-		 AND 
-		 DATEADD(minute, categoria.durata , Evento.data) < DATEADD(minute, Categoria.durata , new.data) 
-		) 
-		 OR
-		 (new.data < Evento.data 
-		 AND
-		 DATEADD(minute, Categoria.durata , Evento.data) < DATEADD(minute, Categoria.durata , new.data)
-		 )
-	 	) ;
-		  
+	 AND 
+	 (
+		 --se finisco dopo l'inizio di un evento E prima della sua fine non va bene
+			((NEW.data + INTERVAL '1 minute' * Categoria.durata) >= Evento.data 
+			 AND ((NEW.data + INTERVAL '1 minute' * Categoria.durata) < Evento.data + INTERVAL '1 minute' * Categoria.durata))
+		OR --se inizio dopo l'inizio di un evento E prima della sua fine non va bene
+        	(NEW.data > Evento.data 
+			 AND (NEW.data < Evento.data + INTERVAL '1 minute' * Categoria.durata)) 
+		OR --se inizio prima E finisco dopo di un evento non va bene
+			(NEW.data < Evento.data 
+			 AND ((Evento.data + INTERVAL '1 minute' * Categoria.durata) < NEW.data + INTERVAL '1 minute' * Categoria.durata))
+	 ) ;
+	 
     IF volte_sede_non_disponibile = 0 THEN
         -- Se la sede è disponibile, conferma la sede
         RETURN NEW;
     ELSE
         -- Se la sede non è disponibile, seleziona una sede alternativa
-        SELECT Impianto --INTO sede_alternativa
+        SELECT Impianto INTO sede_alternativa
         FROM Programma
         WHERE Mese = EXTRACT(MONTH FROM NEW.data)
         ORDER BY Percentuale_utilizzo ASC
@@ -402,12 +398,12 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- Applicazione del trigger alla tabella Evento
-CREATE TRIGGER trigger_gestione_sede_evento
+CREATE OR REPLACE TRIGGER trigger_gestione_sede_evento
 BEFORE INSERT OR UPDATE ON Evento
 FOR EACH ROW
 EXECUTE FUNCTION gestione_sede_evento();
 
-INSERT INTO Evento VALUES (50, '22/06/2024', '20/06/2024', 'false' , 1, null, 'basket Puggia', 'user123');
+--INSERT INTO Evento VALUES (51, '22/06/2024 14:00:00', '21/06/2024 11:00:00', 'TRUE' , 3, 'NBA', 'basket Puggia', 'user123');
 
 /* 5b2: trigger per il mantenimento dell'attributo derivato livello */
 /*************************************************************************************************************************************************************************/ 
