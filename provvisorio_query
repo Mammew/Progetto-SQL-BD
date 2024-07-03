@@ -404,7 +404,28 @@ where ID = 27*/
 
 /* inserire qui i comandi SQL per la creazione del trigger lasciando la specifica nel commento precedente corrispondente al trigger realizzato tra le due alternative proposte per b.,
 a seconda che il livello del giocatore sia memorizzato o meno */ 
+CREATE OR REPLACE FUNCTION keep_track_of_User_level()
+RETURNS TRIGGER AS $$
+DECLARE
+	cat decimal;
+BEGIN
+	Select Categoria into cat
+	From Evento
+	where ID = NEW.Evento_ID;
+	
+	UPDATE Liv_Utente
+	SET livello = user_category_level(NEW.Valutato, cat)
+	WHERE Liv_Utente.Username = NEW.Valutato AND Liv_Utente.ID = cat;
+	
+	RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
 
+
+CREATE OR REPLACE TRIGGER calculate_level_user_cat
+AFTER INSERT OR UPDATE ON Prestazione
+FOR EACH ROW
+EXECUTE FUNCTION keep_track_of_User_level();
 
 
 
