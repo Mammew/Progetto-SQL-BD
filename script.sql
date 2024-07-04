@@ -73,7 +73,7 @@ CREATE TABLE Torneo (
 CREATE TABLE Squadra(
 	ID decimal (5,0) not null PRIMARY KEY,
 	NomeS varchar(25) not null,
-	Torneo varchar(30) not null REFERENCES Torneo (NomeT),
+	Torneo varchar(30) REFERENCES Torneo (NomeT),
 	Organizzatore varchar (25) not null REFERENCES Utente(Username) CHECK (is_organizzatore_premium(Organizzatore)),
 	num_giocatori_max decimal (2,0) not null,
 	num_giocatori_min decimal (2,0) not null check (num_giocatori_min <= num_giocatori_max),
@@ -193,7 +193,6 @@ CREATE TABLE Prestazione(
 -- E' possibile valutare un Utente solamente in Eventi a cui ha preso parte (sia come singolo che come squadra)
 -- Implementabile tramite Trigger.
 
--- 
 ---------------------------------------------------------------------------------------------------
 
 CREATE TABLE Punti_Segnati(
@@ -257,7 +256,7 @@ VALUES ('user123', true,'M','Informatica', 'Rossi', 'Mario', 123456789, 'passwor
 INSERT INTO Utente (Username, genere, corso_di_studi, cognome, nome, telefono, password, matricola, luogoN, dataN)
 VALUES ('FQ30','M','Matematica statistica', 'Queirolo', 'Federico', 163456789, 'password123', 1337567, 'Genova', '2002-12-30');
 
--- simple non ha mai partecipato a un evento non può valutare
+-- simple non ha mai partecipato a un evento non può valutare ( è stato rifiutato)
 INSERT INTO Utente (Username, premium, genere, corso_di_studi, cognome, nome, telefono, password, matricola, luogoN, dataN)
 VALUES ('simple2', true,'F','Giurisprudenza', 'Francesca', 'Totti', 128456789, 'password123', 1034567, 'Torino', '1999-01-01');
 
@@ -402,12 +401,12 @@ INSERT INTO Torneo VALUES ('Euroleague', '15/07/2024', 'user456', 'Torneo di bas
 INSERT INTO Torneo VALUES ('US Open', '25/07/2025', 'user123', 'Torneo di tennis su cemento');
 INSERT INTO Torneo VALUES ('Serie A', '30/07/2024', 'user456', 'Campionato di calcio italiano');
 INSERT INTO Torneo VALUES ('NBA Finals', '01/08/2024', 'user789', 'Finali del campionato di basket NBA');
-INSERT INTO Torneo VALUES ('Olympics', '05/08/2025', 'user456', 'Giochi olimpici di pallavolo');
+INSERT INTO Torneo VALUES ('Olympics', '10/06/2024', 'user456', 'Giochi olimpici di pallavolo');
 INSERT INTO Torneo VALUES ('French Open', '10/08/2024', 'user123', 'Torneo di tennis su terra battuta');
 ---
 INSERT INTO Squadra VALUES(1, 'Boston', 'NBA', 'user123', 16, 5, 'verde','aperto');
--- squadra 2 aperta per candidature non ancora iscritta a nessun evento
-INSERT INTO Squadra VALUES(2, 'NonTroppoAtletici', 'FIVB', 'user123', 14, 6, 'bianco','aperto');
+-- iscritta a un evento spot
+INSERT INTO Squadra VALUES(2, 'NonTroppoAtletici',null,'user123', 12, 6, 'bianco','aperto');
 INSERT INTO Squadra VALUES(3, 'Cardedu', 'Roland garros', 'user789', 1, 1, null,'aperto');
 -- squadra 4 aperta per candidature non ancora iscritta a nessun evento
 INSERT INTO Squadra VALUES(4, 'SanfruBeach', 'US Open', 'user456', 1, 1, null,'aperto');
@@ -422,6 +421,7 @@ INSERT INTO Squadra VALUES(10, 'FC Barcelona', 'Champions League', 'user789', 18
 INSERT INTO Squadra VALUES(11, 'Real Madrid', 'Champions League', 'user789', 18, 7, 'bianco', 'aperto');
 INSERT INTO Squadra VALUES(12, 'VolleyClub Milano', 'Olympics', 'user456', 12, 6, 'blu', 'aperto');
 INSERT INTO Squadra VALUES(13, 'Alghero', 'Roland garros', 'user456', 1, 1, null,'aperto');
+INSERT INTO Squadra VALUES(14, 'VolleyClub Genova', null, 'user456', 12, 6, 'blu', 'aperto');
 ------
 
 -- Squadra 1 gioca NBA minimo giocatori 7
@@ -449,10 +449,11 @@ INSERT INTO Candidatura VALUES('user011', 7,'accettato');
 INSERT INTO Candidatura VALUES('user012', 7,'accettato');
 
 INSERT INTO Candidatura VALUES('FQ30', 7,'rifiutato');
+INSERT INTO Candidatura VALUES('simple2', 7,'rifiutato');
 
 -- Squadre 3 e 13 roland garros
-INSERT INTO Candidatura VALUES('user013', 3,'accettato');
-INSERT INTO Candidatura VALUES('user014', 13,'accettato');
+INSERT INTO Candidatura VALUES('user123', 3,'accettato');
+INSERT INTO Candidatura VALUES('FQ30' , 13,'accettato');
 
 
 -- Squadra 6 gioca a calcio Mondiale
@@ -507,18 +508,24 @@ INSERT INTO Candidatura VALUES('user010', 11,'accettato');
 INSERT INTO Candidatura VALUES('user011', 11,'accettato');
 INSERT INTO Candidatura VALUES('user026', 11,'accettato');
 
--- squadre che non arrivano al numero minimo di partecipanti
--- utente user123 ha tutte le categorie
-INSERT INTO Candidatura VALUES('user123', 4,'accettato');
 -- ultime due squadre non hanno nessuno contro cui giocare nel torneo da gestire
--- lo abbiamo fatto per avere un utente che ha tutte le categorie
--- squadra 2 pallavolo maschile 
+
+--Squadra 2  pallavolo maschi evento spot
 INSERT INTO Candidatura VALUES('user123', 2,'accettato');
 INSERT INTO Candidatura VALUES('user008', 2,'accettato');
-INSERT INTO Candidatura VALUES('user009', 2,'accettato');
-INSERT INTO Candidatura VALUES('user010', 2,'accettato');
-INSERT INTO Candidatura VALUES('user011', 2,'accettato');
-INSERT INTO Candidatura VALUES('user012', 2,'accettato');
+INSERT INTO Candidatura VALUES('user456', 2,'accettato');
+INSERT INTO Candidatura VALUES('user001', 2,'accettato');
+INSERT INTO Candidatura VALUES('user002', 2,'accettato');
+INSERT INTO Candidatura VALUES('user003', 2,'accettato');
+
+-- Squadra 14 pallavolo machi spot
+INSERT INTO Candidatura VALUES('user004', 14,'accettato');
+INSERT INTO Candidatura VALUES('user005', 14,'accettato');
+INSERT INTO Candidatura VALUES('user006', 14,'accettato');
+INSERT INTO Candidatura VALUES('user007', 14,'accettato');
+INSERT INTO Candidatura VALUES('user009', 14,'accettato');
+INSERT INTO Candidatura VALUES('user010', 14,'accettato');
+
 
 INSERT INTO Restrizioni VALUES (1, 'Torneo solamente per altleti non tesserati');
 INSERT INTO Restrizioni VALUES (2, 'Torneo solamente per femmine ');
@@ -579,8 +586,7 @@ INSERT INTO Impianto VALUES('tennis Puggia','valletta puggia',222222222,'tennisp
 INSERT INTO Impianto VALUES('basket Puggia','valletta puggia',223344556,'basketp@gmail.com');
 INSERT INTO Impianto VALUES('pallavolo Puggia','valletta puggia',998866523,'pallavolop@gmail.com');
 
-INSERT INTO Evento VALUES (0, '20/06/2000 13:00:00', '20/06/1999 9:00:00', 'false' , 1, null, 'basket Puggia', 'user123');
-
+----
 INSERT INTO Evento VALUES (1, '22/06/2024 13:00:00', '20/06/2024 11:00:00', 'false' , 1, null, 'basket Puggia', 'user123');
 INSERT INTO Evento VALUES (2, '22/06/2024 14:00:00', '21/06/2024 11:00:00', 'TRUE' , 3, 'Roland garros', 'tennis Puggia', 'user123');
 INSERT INTO Evento VALUES (3, '23/06/2024 16:00:00', '22/06/2024 11:00:00', 'false' , 2, 'FIVB', 'pallavolo Puggia', 'user789');
@@ -590,28 +596,30 @@ INSERT INTO Evento VALUES (6, '29/06/2024 12:00:00', '22/06/2024 11:00:00', 'fal
 INSERT INTO Evento VALUES (7, '01/07/2024 19:00:00', '30/06/2024 11:00:00', 'true', 2, 'World Volleyball Championship', 'pallavolo Puggia', 'user456');
 
 --EVENTO CHE CHIUDO PERCHè NON è ARRIVATO AL NUMERO MINIMO DI PARTECIPANTI
-/*INSERT INTO Evento VALUES (8, '05/04/2024', '03/04/2024', 'false', 3, 'Wimbledon', 'tennis Puggia', 'user123');
-UPDATE Evento
+INSERT INTO Evento VALUES (8, '05/04/2024', '03/04/2024', 'false', 3, 'Wimbledon', 'tennis Puggia', 'user123');
+/*UPDATE Evento
 SET stato = 'chiuso'
 WHERE ID = 8;*/
 
 INSERT INTO Evento VALUES (9, '15/07/2024 15:00:00', '13/07/2024 11:00:00', 'true', 4, 'Champions League', 'calcio Gambaro', 'user789');
 INSERT INTO Evento VALUES (10, '15/07/2024 18:00:00', '14/07/2024 11:00:00', 'false', 1, 'Euroleague', 'basket Puggia', 'user456');
 INSERT INTO Evento VALUES (11, '20/07/2024 20:00:00', '19/07/2024 11:00:00', 'true', 2, 'FIVB', 'pallavolo Puggia', 'user789');
+
+-- Gli Eventi sottostanti non possono esistere
 --> INSERT INTO Evento VALUES (12, '25/07/2024', '24/07/2024', 'false', 3, 'US Open', 'tennis Puggia', 'user123');
 --> INSERT INTO Evento VALUES (13, '30/07/2024', '29/07/2024', 'true', 4, 'Serie A', 'calcio Gambaro', 'user456');
 -->INSERT INTO Evento VALUES (14, '01/08/2024', '31/07/2024', 'false', 1, 'NBA Finals', 'basket Puggia', 'user789');
 INSERT INTO Evento VALUES (15, '10/08/2025 18:00:00', '08/08/2025 11:00:00', 'true', 2, 'Olympics', 'pallavolo Puggia', 'user456');
-INSERT INTO Evento VALUES (16, '10/08/2024 15:00:00', '09/08/2024 11:00:00', 'false', 4, 'Mondiale', 'calcio Gambaro', 'user789');
+INSERT INTO Evento VALUES (16, '15/08/2024 15:00:00', '13/08/2024 11:00:00', 'false', 4, 'Mondiale', 'calcio Gambaro', 'user789');
 INSERT INTO Evento VALUES (17, '30/07/2025 18:00:00', '28/07/2025 11:00:00', 'TRUE' , 3, 'US Open', 'tennis Puggia', 'user123');
-----
+---- No Squadre in questo Evento
 INSERT INTO Evento VALUES (19, '30/07/2025 18:00:00', '25/07/2025 11:00:00', 'false' , 3, 'US Open', 'tennis Puggia', 'user123');
-----
 -- Eventi per far partecipare a tutte le categorie l'Utente 'user123'
-INSERT INTO Evento VALUES (22, '21/06/2024 13:00:00', '20/06/2024 11:00:00', 'false' , 3, null, 'tennis Puggia', 'user123');
 INSERT INTO Evento VALUES (21, '20/06/2024 13:00:00', '18/06/2024 11:00:00', 'false' , 2, null, 'pallavolo Puggia', 'user123');
+-- Inserimento di un Evento in un Impianto occupato nell'ora del nuovo Evento attivazione Trigger trova nuovo Impianto
+INSERT INTO Evento VALUES (20, '30/07/2025 18:00:00', '25/07/2025 11:00:00', 'false' , 3, 'US Open', 'tennis Puggia', 'user123');
 
-
+--PARTECIPAZIONI
 --Partecipazione di Boston (Squadra_ID = 1) all evento NBA (Evento_ID = 5)
 INSERT INTO Partecipa VALUES (1, 5, 85);
 
@@ -639,10 +647,10 @@ INSERT INTO Partecipa VALUES (7, 6, 35);
 -- Partecipazione di Bostom (Squadra_ID = 1) all'evento NBA (Evento_ID = 6)
 INSERT INTO Partecipa VALUES (1, 6, 78);
 
--- Partecipazione di Team USA (Squadra_ID = 9) all'evento Olympics (Evento_ID = 8)
+-- Partecipazione di Team USA (Squadra_ID = 9) all'evento Olympics (Evento_ID = 15)
 INSERT INTO Partecipa VALUES (9, 15, 75);
 
--- Partecipazione di VolleyClub Milano (Squadra_ID = 12)  all'evento Olympics (Evento_ID = 8)
+-- Partecipazione di VolleyClub Milano (Squadra_ID = 12)  all'evento Olympics (Evento_ID = 15)
 INSERT INTO Partecipa VALUES (12, 15, 82);
 
 -- Partecipazione di FC Barcelona (Squadra_ID = 10) all'evento Champions League (Evento_ID = 9)
@@ -652,13 +660,10 @@ INSERT INTO Partecipa VALUES (10, 9, 4);
 INSERT INTO Partecipa VALUES (11, 9, 2);
 
 -- eventi per avere l'utente che partecipa a tutte le categore
-INSERT INTO Partecipa VALUES (2, 3, 67); -- Insert della Squadra NonTroppoAtletici (FIVB) all' evento 18 FIVB
-INSERT INTO Partecipa VALUES (4, 17, 3); -- Insert della Squadra SanfuBeach (Europeo) all' evento 17 Europeo
+INSERT INTO Partecipa VALUES (2, 21, 67); -- Insert della Squadra NonTroppoAtletici (FIVB) all' evento 21 spot
+INSERT INTO Partecipa VALUES (14, 21, 60); -- evento 21 di pallavolo
 
-------------------------------------------------------------------------------
-
-
-------
+/***********************************************************************************************************************/
 --INSERT INTO Prestazione VALUES();
 INSERT INTO Prestazione VALUES('user123',4,'user456', 7);
 INSERT INTO Prestazione VALUES('user123',4,'user789', 8);
@@ -689,8 +694,8 @@ INSERT INTO Iscrive VALUES ('user456',5,null,'confermato','10/05/2024 11:00:00',
 INSERT INTO Iscrive VALUES ('user789',5,null,'confermato','10/05/2024 11:00:00','giocatore',null,null);
 INSERT INTO Iscrive VALUES ('user001',5,null,'confermato','10/05/2024 11:00:00','giocatore',null,null);
 INSERT INTO Iscrive VALUES ('user002',5,null,'confermato','10/05/2024 11:00:00','giocatore',null,null);
-INSERT INTO Iscrive VALUES ('user003',5,null,'confermato','10/05/2024 11:00:00','giocatore',null,null);
-INSERT INTO Iscrive VALUES ('user004',5,null,'confermato','10/05/2024 11:00:00','giocatore',null,null);
+--INSERT INTO Iscrive VALUES ('user003',5,null,'confermato','10/05/2024 11:00:00','giocatore',null,null);
+--INSERT INTO Iscrive VALUES ('user004',5,null,'confermato','10/05/2024 11:00:00','giocatore',null,null);
 
 -- Squadra 7 evento 5 Los Angeles NBA
 INSERT INTO Iscrive VALUES ('user006',5,null,'confermato','10/05/2024 11:00:00','giocatore',null,null);
@@ -698,8 +703,8 @@ INSERT INTO Iscrive VALUES ('user007',5,null,'confermato','10/05/2024 11:00:00',
 INSERT INTO Iscrive VALUES ('user008',5,null,'confermato','10/05/2024 11:00:00','giocatore',null,null);
 INSERT INTO Iscrive VALUES ('user009',5,null,'confermato','10/05/2024 11:00:00','giocatore',null,null);
 INSERT INTO Iscrive VALUES ('user010',5,null,'confermato','10/05/2024 11:00:00','giocatore',null,null);
-INSERT INTO Iscrive VALUES ('user011',5,null,'confermato','10/05/2024 11:00:00','giocatore',null,null);
-INSERT INTO Iscrive VALUES ('user012',5,null,'confermato','10/05/2024 11:00:00','giocatore',null,null);
+--INSERT INTO Iscrive VALUES ('user011',5,null,'confermato','10/05/2024 11:00:00','giocatore',null,null);
+--INSERT INTO Iscrive VALUES ('user012',5,null,'confermato','10/05/2024 11:00:00','giocatore',null,null);
 
 --squadra 6 gioca evento 4 Sanfubeach Mondiale 
 INSERT INTO Iscrive VALUES ('user123',4,null,'confermato','1/05/2023 11:00:00','giocatore',null,null);
@@ -743,8 +748,8 @@ INSERT INTO Iscrive VALUES ('user456',6,null,'confermato','10/05/2024 11:00:00',
 INSERT INTO Iscrive VALUES ('user789',6,null,'confermato','10/05/2024 11:00:00','giocatore',null,null);
 INSERT INTO Iscrive VALUES ('user001',6,null,'confermato','10/05/2024 11:00:00','giocatore',null,null);
 INSERT INTO Iscrive VALUES ('user002',6,null,'confermato','10/05/2024 11:00:00','giocatore',null,null);
-INSERT INTO Iscrive VALUES ('user003',6,null,'confermato','10/05/2024 11:00:00','giocatore',null,null);
-INSERT INTO Iscrive VALUES ('user004',6,null,'confermato','10/05/2024 11:00:00','giocatore',null,null);
+--INSERT INTO Iscrive VALUES ('user003',6,null,'confermato','10/05/2024 11:00:00','giocatore',null,null);
+--INSERT INTO Iscrive VALUES ('user004',6,null,'confermato','10/05/2024 11:00:00','giocatore',null,null);
 
 -- Squadra 7 evento 6 Los Angeles NBA
 INSERT INTO Iscrive VALUES ('user006',6,null,'confermato','10/05/2024 11:00:00','giocatore',null,null);
@@ -752,30 +757,32 @@ INSERT INTO Iscrive VALUES ('user007',6,null,'confermato','10/05/2024 11:00:00',
 INSERT INTO Iscrive VALUES ('user008',6,null,'confermato','10/05/2024 11:00:00','giocatore',null,null);
 INSERT INTO Iscrive VALUES ('user009',6,null,'confermato','10/05/2024 11:00:00','giocatore',null,null);
 INSERT INTO Iscrive VALUES ('user010',6,null,'confermato','10/05/2024 11:00:00','giocatore',null,null);
-INSERT INTO Iscrive VALUES ('user011',6,null,'confermato','10/05/2024 11:00:00','giocatore',null,null);
-INSERT INTO Iscrive VALUES ('user012',6,null,'confermato','10/05/2024 11:00:00','giocatore',null,null);
+--INSERT INTO Iscrive VALUES ('user011',6,null,'confermato','10/05/2024 11:00:00','giocatore',null,null);
+--INSERT INTO Iscrive VALUES ('user012',6,null,'confermato','10/05/2024 11:00:00','giocatore',null,null);
 
 -- Squadre 3 e 13 Roland Garros evento 2
-INSERT INTO Iscrive VALUES ('user013',2,null,'confermato','25/08/2023 11:00:00','giocatore',null,null);
-INSERT INTO Iscrive VALUES ('user014',2,null,'confermato','25/08/2023 11:00:00','giocatore',null,null);
+INSERT INTO Iscrive VALUES ('user123',2,null,'confermato','25/08/2023 11:00:00','giocatore',null,null);
+INSERT INTO Iscrive VALUES ('FQ30',2,null,'confermato','25/08/2023 11:00:00','giocatore',null,null);
 
-/***********************************************************************************************************************/
--- Inserimento di 3 user nell evento 19 attivazione TRIGGER chiusura Evento e TRIGGER che blocca Iscrizioni ad Eventi 'chiusi'
-INSERT INTO Iscrive VALUES ('user013',19,null,'confermato','25/08/2023 11:00:00','giocatore',null,null);
-INSERT INTO Iscrive VALUES ('user014',19,null,'confermato','25/08/2023 11:00:00','giocatore',null,null);
--- Questa INSERT fa sollevare l'eccezione
---INSERT INTO Iscrive VALUES ('user015',19,null, 'confermato','25/08/2023 11:00:00','giocatore',null,null);
-/***********************************************************************************************************************/
 
--- Inserimento di un Evento in un Impianto occupato nell'ora del nuovo Evento attivazione Trigger trova nuovo Impianto
-INSERT INTO Evento VALUES (20, '30/07/2025 18:00:00', '25/07/2025 11:00:00', 'false' , 3, 'US Open', 'tennis Puggia', 'user123');
+--Squadra 9 gioca a Olympics 6 giocatrici
+INSERT INTO Iscrive VALUES ('user013', 15,null,'confermato','10/06/2024 11:00:00','giocatore',null,null);
+INSERT INTO Iscrive VALUES ('user014', 15,null,'confermato','10/06/2024 11:00:00','giocatore',null,null);
+INSERT INTO Iscrive VALUES ('user015', 15,null,'confermato','10/06/2024 11:00:00','giocatore',null,null);
+INSERT INTO Iscrive VALUES ('user016', 15,null,'confermato','10/06/2024 11:00:00','giocatore',null,null);
+INSERT INTO Iscrive VALUES ('user017', 15,null,'confermato','10/06/2024 11:00:00','giocatore',null,null);
+INSERT INTO Iscrive VALUES ('user018', 15,null,'confermato','10/06/2024 11:00:00','giocatore',null,null);
 
-/***********************************************************************************************************************/
---INSERT INTO Iscrive per far si che l'Utente 'user123' partecipi ad ogni categoria
--- Tennis
-INSERT INTO Iscrive VALUES ('user123',22,null,'confermato','20/06/2024 12:24:52','giocatore',null,null);
-INSERT INTO Iscrive VALUES ('FQ30',22,null,'confermato','18/06/2024 10:54:20','giocatore',null,null);
--- Pallavolo
+-- Squadra 12 gioca agli Olympics 6 giocatrici
+
+INSERT INTO Iscrive VALUES ('user019', 15,null,'confermato','10/06/2024 11:00:00','giocatore',null,null);
+INSERT INTO Iscrive VALUES ('user020', 15,null,'confermato','10/06/2024 11:00:00','giocatore',null,null);
+INSERT INTO Iscrive VALUES ('user021', 15,null,'confermato','10/06/2024 11:00:00','giocatore',null,null);
+INSERT INTO Iscrive VALUES ('user022', 15,null,'confermato','10/06/2024 11:00:00','giocatore',null,null);
+INSERT INTO Iscrive VALUES ('user023', 15,null,'confermato','10/06/2024 11:00:00','giocatore',null,null);
+INSERT INTO Iscrive VALUES ('user024', 15,null,'confermato','10/06/2024 11:00:00','giocatore',null,null);
+
+-- Pallavolo squadre maschili evento spot
 INSERT INTO Iscrive VALUES ('user123',21,null,'confermato','16/06/2024 12:00:20','giocatore',null,null);
 INSERT INTO Iscrive VALUES ('user008',21,null,'confermato','16/06/2024 12:00:20','giocatore',null,null);
 INSERT INTO Iscrive VALUES ('user456',21,null,'confermato','16/06/2024 12:00:20','giocatore',null,null);
@@ -789,4 +796,11 @@ INSERT INTO Iscrive VALUES ('user006',21,null,'confermato','16/06/2024 12:00:20'
 INSERT INTO Iscrive VALUES ('user007',21,null,'confermato','16/06/2024 12:00:20','giocatore',null,null);
 INSERT INTO Iscrive VALUES ('user009',21,null,'confermato','16/06/2024 12:00:20','giocatore',null,null);
 INSERT INTO Iscrive VALUES ('user010',21,null,'confermato','16/06/2024 12:00:20','giocatore',null,null);
+
+/***********************************************************************************************************************/
+-- Inserimento di 3 user nell evento 19 attivazione TRIGGER chiusura Evento e TRIGGER che blocca Iscrizioni ad Eventi 'chiusi'
+--INSERT INTO Iscrive VALUES ('user013',19,null,'confermato','25/08/2023 11:00:00','giocatore',null,null);
+--INSERT INTO Iscrive VALUES ('user014',19,null,'confermato','25/08/2023 11:00:00','giocatore',null,null);
+-- Questa INSERT fa sollevare l'eccezione
+--INSERT INTO Iscrive VALUES ('user015',19,null, 'confermato','25/08/2023 11:00:00','giocatore',null,null);
 /***********************************************************************************************************************/

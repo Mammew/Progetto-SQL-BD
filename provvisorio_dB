@@ -586,8 +586,7 @@ INSERT INTO Impianto VALUES('tennis Puggia','valletta puggia',222222222,'tennisp
 INSERT INTO Impianto VALUES('basket Puggia','valletta puggia',223344556,'basketp@gmail.com');
 INSERT INTO Impianto VALUES('pallavolo Puggia','valletta puggia',998866523,'pallavolop@gmail.com');
 
-INSERT INTO Evento VALUES (0, '20/06/2000 13:00:00', '20/06/1999 9:00:00', 'false' , 1, null, 'basket Puggia', 'user123');
-
+----
 INSERT INTO Evento VALUES (1, '22/06/2024 13:00:00', '20/06/2024 11:00:00', 'false' , 1, null, 'basket Puggia', 'user123');
 INSERT INTO Evento VALUES (2, '22/06/2024 14:00:00', '21/06/2024 11:00:00', 'TRUE' , 3, 'Roland garros', 'tennis Puggia', 'user123');
 INSERT INTO Evento VALUES (3, '23/06/2024 16:00:00', '22/06/2024 11:00:00', 'false' , 2, 'FIVB', 'pallavolo Puggia', 'user789');
@@ -613,16 +612,12 @@ INSERT INTO Evento VALUES (16, '15/08/2024 15:00:00', '13/08/2024 11:00:00', 'fa
 INSERT INTO Evento VALUES (17, '30/07/2025 18:00:00', '28/07/2025 11:00:00', 'TRUE' , 3, 'US Open', 'tennis Puggia', 'user123');
 ----
 INSERT INTO Evento VALUES (19, '30/07/2025 18:00:00', '25/07/2025 11:00:00', 'false' , 3, 'US Open', 'tennis Puggia', 'user123');
-----
 -- Eventi per far partecipare a tutte le categorie l'Utente 'user123'
---INSERT INTO Evento VALUES (22, '21/06/2024 13:00:00', '20/06/2024 11:00:00', 'false' , 3, null, 'tennis Puggia', 'user123');
 INSERT INTO Evento VALUES (21, '20/06/2024 13:00:00', '18/06/2024 11:00:00', 'false' , 2, null, 'pallavolo Puggia', 'user123');
-
 -- Inserimento di un Evento in un Impianto occupato nell'ora del nuovo Evento attivazione Trigger trova nuovo Impianto
 INSERT INTO Evento VALUES (20, '30/07/2025 18:00:00', '25/07/2025 11:00:00', 'false' , 3, 'US Open', 'tennis Puggia', 'user123');
 
 --PARTECIPAZIONI
-
 --Partecipazione di Boston (Squadra_ID = 1) all evento NBA (Evento_ID = 5)
 INSERT INTO Partecipa VALUES (1, 5, 85);
 
