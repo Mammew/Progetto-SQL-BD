@@ -169,7 +169,7 @@ set search_path to 'UniGeSocialSport_p';
 Create role amministratore;
 Create role utente_premium;
 Create role gestore_impianto;
-Create role utente_standard;
+Create role utente_semplice;
 
 CREATE USER u_admin WITH PASSWORD 'password_admin';
 CREATE USER u_premium WITH PASSWORD 'password_premium';
@@ -184,16 +184,39 @@ GRANT utente_semplice TO u_semplice;
 GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO amministratore;
 GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO amministratore;
 
-GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE Torneo, Squadra, Evento TO utente_premium;
-GRANT USAGE, SELECT ON SEQUENCE torneo_id_seq, squadra_id_seq, evento_id_seq TO utente_premium;
+GRANT SELECT, INSERT, UPDATE ON TABLE Torneo, Squadra, Evento, Partecipa TO utente_premium;
+--GRANT USAGE, SELECT ON SEQUENCE torneo_id_seq, squadra_id_seq, evento_id_seq TO utente_premium;
 
-GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE Impianto, Evento TO gestore_impianto;
-GRANT USAGE, SELECT ON SEQUENCE impianto_id_seq, evento_id_seq TO gestore_impianto;
+GRANT SELECT, INSERT, UPDATE ON TABLE Impianto TO gestore_impianto;
+--GRANT USAGE, SELECT ON SEQUENCE impianto_id_seq, evento_id_seq TO gestore_impianto;
 
 GRANT SELECT ON ALL TABLES IN SCHEMA public TO utente_semplice;
-GRANT SELECT ON ALL SEQUENCES IN SCHEMA public TO utente_semplice;
+GRANT INSERT ON TABLE Iscrive TO utente_semplice;
+--GRANT SELECT ON ALL SEQUENCES IN SCHEMA public TO utente_semplice;
+-- nascondere atributo affidabile per farlo vedere solo all'utente premium
+CREATE VIEW Utente_Semplice_View AS
+SELECT
+    Username,
+    premium,
+    genere,
+    corso_di_studi,
+    cognome,
+    nome,
+    foto,
+    telefono,
+    password,
+    matricola,
+    luogoN,
+    dataN
+FROM Utente;
+-- Concessione di accesso alla vista per l'utente semplice
+GRANT SELECT ON Utente_Semplice_View TO utente_semplice;
 
-GRANT INSERT, UPDATE, DELETE ON TABLE Partecipazione TO utente_premium;
-GRANT INSERT, UPDATE, DELETE ON TABLE Partecipazione TO gestore_impianto;
-GRANT INSERT, UPDATE, DELETE ON TABLE Partecipazione TO utente_semplice;
+-- Revoca dell'accesso diretto alla tabella Utente per l'utente semplice
+REVOKE ALL ON TABLE Utente FROM utente_semplice;
+
+-- Definizione della gerarchia tra i ruoli
+GRANT utente_semplice TO utente_premium;
+GRANT utente_semplice TO gestore_impianto;
+
 
