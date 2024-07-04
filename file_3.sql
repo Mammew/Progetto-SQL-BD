@@ -158,9 +158,42 @@ iscrive_username;
 le operazioni corrispondenti ai privilegi delegati ai ruoli e agli utenti sia correttamente eseguibili. */
 
 
+set search_path to 'ANSI';
 
+Select *
+from information_schema.table_privileges
+where table_schema = 'UniGeSocialSport_p';
 
+set search_path to 'UniGeSocialSport_p';
 
+Create role amministratore;
+Create role utente_premium;
+Create role gestore_impianto;
+Create role utente_standard;
 
+CREATE USER u_admin WITH PASSWORD 'password_admin';
+CREATE USER u_premium WITH PASSWORD 'password_premium';
+CREATE USER u_gestore WITH PASSWORD 'password_gestore';
+CREATE USER u_semplice WITH PASSWORD 'password_utente';
 
+GRANT amministratore TO u_admin;
+GRANT utente_premium TO u_premium;
+GRANT gestore_impianto TO u_gestore;
+GRANT utente_semplice TO u_semplice;
+
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO amministratore;
+GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO amministratore;
+
+GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE Torneo, Squadra, Evento TO utente_premium;
+GRANT USAGE, SELECT ON SEQUENCE torneo_id_seq, squadra_id_seq, evento_id_seq TO utente_premium;
+
+GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE Impianto, Evento TO gestore_impianto;
+GRANT USAGE, SELECT ON SEQUENCE impianto_id_seq, evento_id_seq TO gestore_impianto;
+
+GRANT SELECT ON ALL TABLES IN SCHEMA public TO utente_semplice;
+GRANT SELECT ON ALL SEQUENCES IN SCHEMA public TO utente_semplice;
+
+GRANT INSERT, UPDATE, DELETE ON TABLE Partecipazione TO utente_premium;
+GRANT INSERT, UPDATE, DELETE ON TABLE Partecipazione TO gestore_impianto;
+GRANT INSERT, UPDATE, DELETE ON TABLE Partecipazione TO utente_semplice;
 
