@@ -5,7 +5,7 @@
 set search_path to 'UniGeSocialSport_p';
 
 --- PARTE III 
-/* il file deve essere file SQL ... cio� formato solo testo e apribili ed eseguibili in pgAdmin */
+/* il file deve essere file SQL ... cioè formato solo testo e apribili ed eseguibili in pgAdmin */
 
 
 
@@ -191,7 +191,9 @@ GRANT SELECT, INSERT, UPDATE ON TABLE Impianto TO gestore_impianto;
 --GRANT USAGE, SELECT ON SEQUENCE impianto_id_seq, evento_id_seq TO gestore_impianto;
 
 GRANT SELECT ON ALL TABLES IN SCHEMA public TO utente_semplice;
-GRANT INSERT ON TABLE Iscrive TO utente_semplice;
+GRANT INSERT ON TABLE Iscrive TO utente_semplice; -- Cosi facendo però potrebbe 'confermarsi' da solo = per la candidatura
+-- Possibilità GRANT execute ON nomefunzione TO nomeutente --> per fare INSERT in Iscrive senza mettere lo stato = per candidatura
+
 --GRANT SELECT ON ALL SEQUENCES IN SCHEMA public TO utente_semplice;
 -- nascondere atributo affidabile per farlo vedere solo all'utente premium
 CREATE VIEW Utente_Semplice_View AS

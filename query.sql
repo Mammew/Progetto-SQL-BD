@@ -312,12 +312,25 @@ EXECUTE FUNCTION check_event_closed();
 
 /*Trigger per aggiornare lo stato dell'evento a "CHIUSO"*/
 
-CREATE OR REPLACE FUNCTION close_event_if_full()
+
+CREATE OR REPLACE FUNCTION close_event_if_full_past()
 RETURNS TRIGGER AS $$
 DECLARE
     num_giocatori_categoria INT;
     num_partecipanti INT;
+	is_past boolean;
 BEGIN
+	/*Select (Evento.data < current_date) into is_past
+	from Evento
+	Where ID = NEW.ID;
+	
+	IF is_past = true
+	Then 
+		UPDATE Evento
+        SET stato = 'chiuso'
+        WHERE ID = NEW.ID;
+    END IF;
+	*/
     -- il numero di giocatori previsto dalla categoria
     SELECT num_giocatori INTO num_giocatori_categoria
     FROM Categoria
@@ -343,7 +356,7 @@ LANGUAGE plpgsql;
 CREATE OR REPLACE TRIGGER trg_close_event_if_full
 AFTER INSERT OR UPDATE ON Iscrive
 FOR EACH ROW
-EXECUTE FUNCTION close_event_if_full();
+EXECUTE FUNCTION close_event_if_full_past();
 
 /*************************************************************************************************************************************************************************/ 
 /* 5b1: trigger che gestisce la sede di un evento: se la sede è disponibile nel periodo 
