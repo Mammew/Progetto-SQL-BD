@@ -87,8 +87,8 @@ WHERE luogoN = 'Torino' AND matricola < 5000000
 /* inserire qui i comandi SQL per la creazione della query, in modo da visualizzarne piane di esecuzione e tempi di esecuzione */ 
 
 EXPLAIN ANALYZE SELECT DISTINCT u.Username
- FROM UtenteC u, IscriveC i
-WHERE stato= 'confermato' AND u.Username = i.Username
+FROM UtenteC u, IscriveC i
+WHERE stato= 'confermato' AND u.Username = i.Username AND telefono > 100000000;
 
 EXPLAIN ANALYZE 
 SELECT DISTINCT u.Username
@@ -122,7 +122,9 @@ SELECT
 FROM 
     pg_indexes 
 WHERE 
-    schemaname NOT IN ('pg_catalog', 'information_schema');*/
+    schemaname NOT IN ('pg_catalog', 'information_schema')
+	AND schemaname = 'UniGeSocialSport_p3';
+*/
 	
 SELECT C.oid, relname, relfilenode, relam, relpages, relhasindex, relkind
 FROM pg_namespace N JOIN pg_class C ON N.oid = C.relnamespace
@@ -148,7 +150,7 @@ from Iscrive
 WITH DATA;
 --------------------------------------------------------------
 -- Non ci sono indici nelle tabelle UtenteC & IscriveC
-/*
+
 /**********************************************/
 -- indice per la 1° Query. (ma anche per la 2°)
 CREATE INDEX utente_matricola ON UtenteC(matricola ASC);
@@ -164,42 +166,35 @@ ON UtenteC(Username ASC);
 
 CREATE INDEX iscrive_Username
 ON IscriveC(Username ASC);
+
+CREATE INDEX utente_telefono
+ON UtenteC(telefono ASC);
 /**********************************************/
 
 -- Clusterizzazione degli indici
 CLUSTER UtenteC USING 
 utente_matricola;
 
+CLUSTER UtenteC USING 
+utente_Username;
+
 CLUSTER IscriveC USING 
-iscrive_username;
-*/
+iscrive_Username;
+
 
 -- Drop degli indici
 /*
 DROP INDEX utente_matricola;
 
 DROP INDEX utente_luogon;
-DROP INDEX utente_username;
+DROP INDEX utente_Username;
 
-DROP INDEX iscrive_username;
+DROP INDEX iscrive_Username;
+
+DROP INDEX utente_telefono;
+
 */
 
--- chat
--- Indice sulla colonna di filtro
-CREATE INDEX idx_iscrivec_stato ON IscriveC(stato);
-
--- Indici sulle colonne di join
-CREATE INDEX idx_utentec_username ON UtenteC(Username);
-CREATE INDEX idx_iscrivec_username ON IscriveC(Username);
-
--- Indice composto (opzionale)
-CREATE INDEX idx_iscrivec_username_stato ON IscriveC(Username, stato);
-
-CLUSTER IscriveC USING 
-idx_iscrivec_stato;
-
-CLUSTER IscriveC USING 
-idx_iscrivec_username_stato;
 
 
 
