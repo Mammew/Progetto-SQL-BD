@@ -154,9 +154,11 @@ set search_path to 'ANSI';
 
 Select *
 from information_schema.table_privileges
-where table_schema = 'UniGeSocialSport_p';
+where table_schema = 'UniGeSocialSport';
 
-set search_path to 'UniGeSocialSport_p';
+/*La Creazione dei 4 utenti, uno per ogni ruolo, verrà fatta nel databse completo. Questo perchè nel database LARGE non vi sono tutte le tabelle*/
+
+set search_path to 'UniGeSocialSport';
 
 Create role amministratore;
 Create role utente_premium;
