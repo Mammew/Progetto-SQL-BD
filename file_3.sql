@@ -16,8 +16,8 @@
 
 /* per ogni relazione R coinvolta nel carico di lavoro, inserire qui i comandi SQL per creare una nuova relazione R_CL con schema equivalente a R ma senza vincoli di chiave primaria, secondaria o esterna e con eventuali attributi dummy */
 
-CREATE SCHEMA "UniGeSocialSport_p3";
-set search_path to 'UniGeSocialSport_p3';
+--CREATE SCHEMA "UniGeSocialSport_p3";
+set search_path to 'UniGeSocialSoprt_large';
 
 CREATE TABLE Utente(
 	Username varchar (25) not null PRIMARY KEY,
@@ -69,6 +69,7 @@ EXPLAIN ANALYZE SELECT matricola
 FROM UtenteC
 WHERE matricola < 1000000
 
+
 /*************************************************************************************************************************************************************************/ 
 /* Q2: Query con condizione di selezione complessa e nessun join */
 /*************************************************************************************************************************************************************************/ 
@@ -77,7 +78,7 @@ WHERE matricola < 1000000
 
 EXPLAIN ANALYZE SELECT matricola
 FROM UtenteC
-WHERE luogoN = 'Torino' AND matricola < 5000000
+WHERE luogoN = 'Tokyo' AND matricola < 500000
 
 /*************************************************************************************************************************************************************************/ 
 /* Q3: Query con almeno un join e almeno una condizione di selezione */
@@ -123,9 +124,10 @@ FROM
     pg_indexes 
 WHERE 
     schemaname NOT IN ('pg_catalog', 'information_schema')
-	AND schemaname = 'UniGeSocialSport_p3';
+	AND schemaname = 'UniGeSocialSoprt_large';  ***** --AND schemaname = 'UniGeSocialSport_p3'; *****
 */
-	
+
+
 SELECT C.oid, relname, relfilenode, relam, relpages, relhasindex, relkind
 FROM pg_namespace N JOIN pg_class C ON N.oid = C.relnamespace
 WHERE N.nspname = 'UniGeSocialSport_p3' 
@@ -156,9 +158,20 @@ WITH DATA;
 CREATE INDEX utente_matricola ON UtenteC(matricola ASC);
 /**********************************************/
 -- indice per la 2° Query.
-CREATE INDEX utente_luogon
-ON UtenteC
-USING HASH (luogoN);
+--CREATE INDEX test2_mm_idx ON test2 (major, minor);
+
+CREATE INDEX utente_luogon_matricola
+ON UtenteC (luogoN,matricola)
+
+-- CLUSTER UtenteC USING utente_luogon_matricola; ---------------------------
+
+-- Eliminato perchè uso quello di sopra 
+	--CREATE INDEX utente_luogon
+	--ON UtenteC
+	--USING HASH (luogoN);
+
+	--DROP INDEX utente_luogon;
+
 /**********************************************/
 -- inidice per la 3° Query
 CREATE INDEX utente_Username
@@ -169,6 +182,14 @@ ON IscriveC(Username ASC);
 
 CREATE INDEX utente_telefono
 ON UtenteC(telefono ASC);
+
+-- Indice su tabella Iscrive e attributo: STATO
+	CREATE INDEX iscrivec_stato
+	ON IscriveC 
+	USING HASH (stato);
+
+	--DROP INDEX iscrivec_stato;
+
 /**********************************************/
 
 -- Clusterizzazione degli indici
@@ -184,14 +205,13 @@ iscrive_Username;
 
 -- Drop degli indici
 /*
-DROP INDEX utente_matricola;
-
-DROP INDEX utente_luogon;
-DROP INDEX utente_Username;
-
-DROP INDEX iscrive_Username;
+DROP INDEX utente_luogon_matricola;
 
 DROP INDEX utente_telefono;
+
+DROP INDEX utente_matricola;
+DROP INDEX utente_Username;
+DROP INDEX iscrive_Username;
 
 */
 
