@@ -150,7 +150,7 @@ drop index utente_matricola;
 /* inserire qui i comandi SQL per la definizione della politica di controllo dell'accesso della base di dati  (definizione ruoli, gerarchia, definizione utenti, assegnazione privilegi) in modo che, dopo l'esecuzione di questi comandi, 
 le operazioni corrispondenti ai privilegi delegati ai ruoli e agli utenti sia correttamente eseguibili. */
 
-set search_path to 'UniGeSocialSport_p';
+set search_path to 'UniGeSocialSport';
 
 Create role amministratore;
 Create role utente_premium;
