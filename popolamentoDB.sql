@@ -1,4 +1,4 @@
-set search_path to 'UniGeSocialSport_p';
+set search_path to 'UniGeSocialSport';
 
 INSERT INTO Utente (Username, premium, genere,corso_di_studi, cognome, nome, telefono, password, matricola, luogoN, dataN, affidabile)
 VALUES ('user123', true,'M','Informatica', 'Rossi', 'Mario', 123456789, 'password123', 1234567, 'Torino', '1990-01-01',true);

@@ -1,4 +1,4 @@
-set search_path to 'UniGeSocialSport_p';
+set search_path to 'UniGeSocialSport';
 -------------------------------------------------------------------
 
 --2. Vista

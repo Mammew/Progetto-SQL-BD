@@ -1,5 +1,5 @@
-CREATE SCHEMA "UniGeSocialSport_p";
-set search_path to 'UniGeSocialSport_p';
+CREATE SCHEMA "UniGeSocialSport";
+set search_path to 'UniGeSocialSport';
 set datestyle to "DMY";
 
 CREATE TABLE Utente(

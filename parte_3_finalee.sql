@@ -1,10 +1,12 @@
 --- Progetto BD 23-24 (12 CFU)
---- Numero gruppo
---- Nomi e matricole componenti
+--- Team 26
+--- Elena Deidda 5448731
+---	Marco Mammoliti 5564736
+---	Filippo Pedullà 5575626
 
 
 --- PARTE III 
-/* il file deve essere file SQL ... cio� formato solo testo e apribili ed eseguibili in pgAdmin */
+/* il file deve essere file SQL ... cioè formato solo testo e apribili ed eseguibili in pgAdmin */
 
 
 
