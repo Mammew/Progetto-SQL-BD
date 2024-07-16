@@ -72,11 +72,9 @@ from(
 /*************************************************************************************************************************************************************************/ 
 
 /* inserire qui i comandi SQL per la creazione della query senza rimuovere la specifica nel commento precedente */ 
---join Iscrive on Iscrive.Username = Utente.Username
+-- l'eventuale join Iscrive on Iscrive.Username = Utente.Username
 -- è superflua perche se ha preso parte all'evento allora è stato messo in una Squadra.
-select *
-from Iscrive
-where Username = 'user123'
+
 
 Select Username
 from (Select distinct Utente.Username, Categoria
@@ -85,15 +83,6 @@ from (Select distinct Utente.Username, Categoria
 		where  Iscrive.stato = 'confermato' AND Evento.data <= current_date)
 group by Username
 HAVING count (distinct Categoria) = (Select count (*) from Categoria);
-
-/*Union
-Select Username
-from (Select distinct Utente.Username, Categoria
-		from Utente natural join Candidatura join Partecipa on Candidatura.Squadra = Squadra_ID
-	  		 join Evento on Evento_ID = Evento.ID
-		where Candidatura.stato = 'confermato' AND Evento.data <= current_date)
-group by Username
-HAVING count (distinct Categoria) = (Select count (*) from Categoria)*/
 
 /*************************************************************************************************************************************************************************/ 
 /* 3c: determinare per ogni categoria il corso di laurea più attivo in tale categoria, 
@@ -108,7 +97,6 @@ Group by nomeC, corso_di_studi
 Having count(Username) >= ALL (Select count(Username)
 						 	From Categoria join Liv_utente on Categoria.ID = Liv_utente.ID natural join Utente
 							Group by nomeC, corso_di_studi);
-
 
 
 /*************************************************************************************************************************************************************************/ 
@@ -141,8 +129,8 @@ LANGUAGE plpgsql;
 /*************************************************************************************************************************************************************************/ 
 /* 4b1: funzione che dato un giocatore ne calcoli il livello */
 
-/*
-calcolo la media delle valutazioni la peso in centesimi e ottengo il mio livello
+-- ALGORTIMO
+/*calcolo la media delle valutazioni la peso in centesimi e ottengo il mio livello
 se ho perso l'ultima partita al mio livello in centesimo sottagraggo 3
 se ho il flag affidabile a false la mia valutazione sarà inferiore di 5*/
 
@@ -279,7 +267,7 @@ END;
 $$ 
 LANGUAGE plpgsql;
 
-Select * from FrazionePartecipantiFemminili(3,'Chimica');
+-- Select * from FrazionePartecipantiFemminili(3,'Chimica');
 
 /*************************************************************************************************************************************************************************/ 
 --5. Trigger
@@ -320,17 +308,6 @@ DECLARE
     num_partecipanti INT;
 	is_past boolean;
 BEGIN
-	/*Select (Evento.data < current_date) into is_past
-	from Evento
-	Where ID = NEW.ID;
-	
-	IF is_past = true
-	Then 
-		UPDATE Evento
-        SET stato = 'chiuso'
-        WHERE ID = NEW.ID;
-    END IF;
-	*/
     -- il numero di giocatori previsto dalla categoria
     SELECT num_giocatori INTO num_giocatori_categoria
     FROM Categoria

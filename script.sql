@@ -237,7 +237,6 @@ CREATE TABLE Iscrive(
 	UNIQUE(Username,ID,Sostituto)
 );
 -- E' possibile iscriversi solo ad Eventi aventi il campo Torneo = NULL
---Evento 0:
 	
 -----------------------------------------------------------------
 -- Trigger che impone che solo squadre con nomi differenti possono iscriversi allo stesso evento
