@@ -5,6 +5,7 @@ Si esegue prima il file _script.sql_
 Si esugua poi il file _trigger_funz.sql_
 
 Si esugue per ultimo _popolamentoDB.sql_
+il popolamento del DB intero, non parte 3, è stato scritto a mano. E' stato infatti realizzato un insieme di dati consistenti con quanto specificato nel documento
   
 ## INFO sui dati delle INSERT INTO
 |Evento	|Squadre	|Categoria	    |Torneo             |
