@@ -4,7 +4,10 @@ Si esegue prima il file _script.sql_
 
 Si esugua poi il file _trigger_funz.sql_
 
-Si esugue per ultimo _popolamentoDB.sql_
+Si esugue per ultimo _popolamentoDB.sql_ 
+- Il popolamento non risulta vasto in quanto è stato scritto a mano. E' stato creato un insieme di dati consistenti sia per quanto riguarda i trigger implementati ma anche e sopratutto per quelli che non sono stati sviluppati.
+
+Naturalmente viene fatto eseguire prima il file _trigger_funz.sql_ del file _popolamentoDB.sql_ cosi da esser sicuri che i dati siano consistenti. vengono forniti (sia nel file del popolamento che in quello delle funzioni), sotto forma di commenti, delle INSERT o delle query che verificano il funzionamento di TRIGGER, FUNCTION, ecc...
   
 ## INFO sui dati delle INSERT INTO
 |Evento	|Squadre	|Categoria	    |Torneo             |

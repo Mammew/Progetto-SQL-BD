@@ -33,7 +33,7 @@ CREATE OR REPLACE VIEW Programma(Impianto, Mese,Numero_Torneo, Numero_Eventi, Ca
 	Where Iscrive.stato = 'confermato'
 	Group by (Impianto, Mese, nomeC);
 
-Select * from Programma;
+--Select * from Programma;
 
 /*************************************************************************************************************************************************************************/ 
 --3. Interrogazioni
@@ -74,9 +74,6 @@ from(
 /* inserire qui i comandi SQL per la creazione della query senza rimuovere la specifica nel commento precedente */ 
 --join Iscrive on Iscrive.Username = Utente.Username
 -- è superflua perche se ha preso parte all'evento allora è stato messo in una Squadra.
-select *
-from Iscrive
-where Username = 'user123'
 
 Select Username
 from (Select distinct Utente.Username, Categoria
@@ -85,15 +82,6 @@ from (Select distinct Utente.Username, Categoria
 		where  Iscrive.stato = 'confermato' AND Evento.data <= current_date)
 group by Username
 HAVING count (distinct Categoria) = (Select count (*) from Categoria);
-
-/*Union
-Select Username
-from (Select distinct Utente.Username, Categoria
-		from Utente natural join Candidatura join Partecipa on Candidatura.Squadra = Squadra_ID
-	  		 join Evento on Evento_ID = Evento.ID
-		where Candidatura.stato = 'confermato' AND Evento.data <= current_date)
-group by Username
-HAVING count (distinct Categoria) = (Select count (*) from Categoria)*/
 
 /*************************************************************************************************************************************************************************/ 
 /* 3c: determinare per ogni categoria il corso di laurea più attivo in tale categoria, 
@@ -279,7 +267,7 @@ END;
 $$ 
 LANGUAGE plpgsql;
 
-Select * from FrazionePartecipantiFemminili(3,'Chimica');
+-- Select * from FrazionePartecipantiFemminili(3,'Chimica');
 
 /*************************************************************************************************************************************************************************/ 
 --5. Trigger
