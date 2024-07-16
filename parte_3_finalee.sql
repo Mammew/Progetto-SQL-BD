@@ -150,12 +150,6 @@ drop index utente_matricola;
 /* inserire qui i comandi SQL per la definizione della politica di controllo dell'accesso della base di dati  (definizione ruoli, gerarchia, definizione utenti, assegnazione privilegi) in modo che, dopo l'esecuzione di questi comandi, 
 le operazioni corrispondenti ai privilegi delegati ai ruoli e agli utenti sia correttamente eseguibili. */
 
-set search_path to 'ANSI';
-
-Select *
-from information_schema.table_privileges
-where table_schema = 'UniGeSocialSport_p';
-
 set search_path to 'UniGeSocialSport_p';
 
 Create role amministratore;
@@ -176,25 +170,17 @@ GRANT utente_semplice TO u_semplice;
 GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO amministratore;
 GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO amministratore;
 
-GRANT SELECT, INSERT, UPDATE ON TABLE Torneo, Squadra, Evento, Partecipa TO utente_premium;
---GRANT USAGE, SELECT ON SEQUENCE torneo_id_seq, squadra_id_seq, evento_id_seq TO utente_premium;
+GRANT INSERT, UPDATE, DELETE ON TABLE Torneo, Squadra, Evento, Note TO utente_premium;
+GRANT INSERT, UPDATE ON TABLE Partecipa, Restrizioni, RestrizioniTorneo, Sponsor, SponsorTorneo, Premio, PremioTorneo, Punti_Segnati,  TO utente_premium;
+GRANT UPDATE ON TABLE Candidatura, Iscrive TO utente_premium;
 
-GRANT SELECT, INSERT, UPDATE ON TABLE Impianto TO gestore_impianto;
---GRANT USAGE, SELECT ON SEQUENCE impianto_id_seq, evento_id_seq TO gestore_impianto;
+GRANT INSERT, UPDATE ON TABLE Impianto TO gestore_impianto;
 
 GRANT SELECT ON ALL TABLES IN SCHEMA public TO utente_semplice;
-GRANT INSERT ON TABLE Iscrive TO utente_semplice;
-
---GRANT SELECT ON ALL SEQUENCES IN SCHEMA public TO utente_semplice;
--- nascondere atributo affidabile per farlo vedere solo all'utente premium
-
--- Concessione di accesso alla vista per l'utente semplice
-GRANT SELECT ON Utente_Semplice_View TO utente_semplice;
-
--- Revoca dell'accesso diretto alla tabella Utente per l'utente semplice
-REVOKE ALL ON TABLE Utente FROM utente_semplice;
+GRANT INSERT ON TABLE Iscrive, Candidatura, Prestazione TO utente_semplice;
 
 -- Definizione della gerarchia tra i ruoli
+-- l'amministratore possedendo tutti i permessi non è stato messo in gerarchia perchè non ha nessun permesso da ereditare
 GRANT utente_semplice TO utente_premium;
 GRANT utente_semplice TO gestore_impianto;
 
