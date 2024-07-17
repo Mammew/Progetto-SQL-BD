@@ -348,18 +348,11 @@ INSERT INTO Evento VALUES (7, '01/07/2024 19:00:00', '30/06/2024 11:00:00', 'tru
 
 --EVENTO CHE CHIUDO PERCHè NON è ARRIVATO AL NUMERO MINIMO DI PARTECIPANTI
 INSERT INTO Evento VALUES (8, '05/04/2024', '03/04/2024', 'false', 3, 'Wimbledon', 'tennis Puggia', 'user123');
-/*UPDATE Evento
-SET stato = 'chiuso'
-WHERE ID = 8;*/
 
 INSERT INTO Evento VALUES (9, '15/07/2024 15:00:00', '13/07/2024 11:00:00', 'true', 4, 'Champions League', 'calcio Gambaro', 'user789');
 INSERT INTO Evento VALUES (10, '15/07/2024 18:00:00', '14/07/2024 11:00:00', 'false', 1, 'Euroleague', 'basket Puggia', 'user456');
 INSERT INTO Evento VALUES (11, '20/07/2024 20:00:00', '19/07/2024 11:00:00', 'true', 2, 'FIVB', 'pallavolo Puggia', 'user789');
 
--- Gli Eventi sottostanti non possono esistere
---> INSERT INTO Evento VALUES (12, '25/07/2024', '24/07/2024', 'false', 3, 'US Open', 'tennis Puggia', 'user123');
---> INSERT INTO Evento VALUES (13, '30/07/2024', '29/07/2024', 'true', 4, 'Serie A', 'calcio Gambaro', 'user456');
--->INSERT INTO Evento VALUES (14, '01/08/2024', '31/07/2024', 'false', 1, 'NBA Finals', 'basket Puggia', 'user789');
 INSERT INTO Evento VALUES (15, '10/08/2025 18:00:00', '08/08/2025 11:00:00', 'true', 2, 'Olympics', 'pallavolo Puggia', 'user456');
 INSERT INTO Evento VALUES (16, '15/08/2024 15:00:00', '13/08/2024 11:00:00', 'false', 4, 'Mondiale', 'calcio Gambaro', 'user789');
 INSERT INTO Evento VALUES (17, '30/07/2025 18:00:00', '28/07/2025 11:00:00', 'TRUE' , 3, 'US Open', 'tennis Puggia', 'user123');
@@ -388,9 +381,6 @@ INSERT INTO Partecipa VALUES (13, 2, 2);
 
  -- Partecipazione di Team Italy (Squadra_ID = 8) all'evento Mondiale  (Evento_ID = 4)
 INSERT INTO Partecipa VALUES (8, 4, 2);
-
--- Partecipazione di Boston (Squadra_ID = 5) all'evento fiba (Evento_ID = 4)
---> INSERT INTO Partecipa VALUES (5, 4, 82); FIBA NON HA EVENTI
 
 -- Partecipazione di Los Angeles (Squadra_ID = 7) all'evento NBA (Evento_ID = 6)
 INSERT INTO Partecipa VALUES (7, 6, 35);

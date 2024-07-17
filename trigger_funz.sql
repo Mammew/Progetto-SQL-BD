@@ -33,7 +33,7 @@ CREATE OR REPLACE VIEW Programma(Impianto, Mese,Numero_Torneo, Numero_Eventi, Ca
 	Where Iscrive.stato = 'confermato'
 	Group by (Impianto, Mese, nomeC);
 
-Select * from Programma;
+--Select * from Programma;
 
 /*************************************************************************************************************************************************************************/ 
 --3. Interrogazioni
@@ -74,7 +74,6 @@ from(
 /* inserire qui i comandi SQL per la creazione della query senza rimuovere la specifica nel commento precedente */ 
 -- l'eventuale join Iscrive on Iscrive.Username = Utente.Username
 -- è superflua perche se ha preso parte all'evento allora è stato messo in una Squadra.
-
 
 Select Username
 from (Select distinct Utente.Username, Categoria
